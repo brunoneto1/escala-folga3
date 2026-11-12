@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PageHeader } from "@/components/PageHeader";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { listarCargos, salvarCargo, excluirCargo, type Cargo } from "@/services/cargos";
+import { listarFuncionarios } from "@/services/funcionarios";
 
 export const Route = createFileRoute("/cargos")({
   head: () => ({ meta: [
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/cargos")({
 function CargosPage() {
   const qc = useQueryClient();
   const { data: cargos = [], isLoading } = useQuery({ queryKey: ["cargos"], queryFn: listarCargos });
+  const { data: funcionarios = [], isLoading: funcionariosLoading } = useQuery({ queryKey: ["funcionarios"], queryFn: listarFuncionarios });
   const [editando, setEditando] = useState<Cargo | null>(null);
   const [aberto, setAberto] = useState(false);
   const [nome, setNome] = useState("");
@@ -49,13 +51,26 @@ function CargosPage() {
         action={<Button onClick={() => abrir(null)}><Plus /> Novo cargo</Button>} />
       <div className="rounded-xl border bg-card shadow-sm">
         <Table>
-          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Funcionários</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
           <TableBody>
-            {isLoading ? <TableRow><TableCell colSpan={2} className="text-muted-foreground">Carregando…</TableCell></TableRow>
-            : cargos.length === 0 ? <TableRow><TableCell colSpan={2} className="py-10 text-center text-muted-foreground">Nenhum cargo cadastrado ainda.</TableCell></TableRow>
+            {isLoading ? <TableRow><TableCell colSpan={3} className="text-muted-foreground">Carregando…</TableCell></TableRow>
+            : cargos.length === 0 ? <TableRow><TableCell colSpan={3} className="py-10 text-center text-muted-foreground">Nenhum cargo cadastrado ainda.</TableCell></TableRow>
             : cargos.map((c) => (
               <TableRow key={c.id}>
                 <TableCell className="font-semibold">{c.nome}</TableCell>
+                <TableCell>
+                  {funcionariosLoading ? <span className="text-muted-foreground">Carregando…</span> : (
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      {funcionarios.filter((f) => f.cargo_id === c.id).map((f) => (
+                        <span key={f.id} className="flex items-center gap-2 text-sm">
+                          <span className="size-2.5 rounded-full" style={{ backgroundColor: f.cor }} />
+                          {f.nome}
+                        </span>
+                      ))}
+                      {funcionarios.every((f) => f.cargo_id !== c.id) && <span className="text-sm text-muted-foreground">Nenhum funcionário</span>}
+                    </div>
+                  )}
+                </TableCell>
                 <TableCell className="text-right">
                   <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => abrir(c)}><Pencil /></Button>
                   <Button variant="ghost" size="icon" aria-label="Excluir" onClick={() => setExcluir(c)}><Trash2 className="text-destructive" /></Button>
