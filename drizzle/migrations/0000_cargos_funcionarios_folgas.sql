@@ -1,0 +1,13 @@
+CREATE TABLE public.cargos (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), nome text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+CREATE UNIQUE INDEX cargos_nome_unique ON public.cargos (lower(btrim(nome)));
+CREATE TABLE public.funcionarios (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), nome text NOT NULL, cargo_id uuid NOT NULL REFERENCES public.cargos(id) ON DELETE RESTRICT, cor text NOT NULL DEFAULT '#0f766e', created_at timestamptz NOT NULL DEFAULT now());
+CREATE UNIQUE INDEX funcionarios_nome_unique ON public.funcionarios (lower(btrim(nome)));
+CREATE TABLE public.folgas (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), funcionario_id uuid NOT NULL REFERENCES public.funcionarios(id) ON DELETE CASCADE, data date NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE (funcionario_id, data));
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.cargos, public.funcionarios, public.folgas TO anon, authenticated;
+GRANT ALL ON public.cargos, public.funcionarios, public.folgas TO service_role;
+ALTER TABLE public.cargos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.funcionarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.folgas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "acesso publico cargos" ON public.cargos FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "acesso publico funcionarios" ON public.funcionarios FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "acesso publico folgas" ON public.folgas FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
