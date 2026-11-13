@@ -1,0 +1,2 @@
+ALTER TABLE public.cargos
+  ADD COLUMN IF NOT EXISTS cor text NOT NULL DEFAULT '#64748b';
