@@ -13,6 +13,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { PageHeader } from "@/components/PageHeader";
+import { listarCargos, type Cargo } from "@/services/cargos";
 import { listarFuncionarios } from "@/services/funcionarios";
 import { listarFolgas, criarFolga, excluirFolga } from "@/services/folgas";
 import { CONFIG_PADRAO, verificarFolga, type ConfigEscala } from "@/rules";
@@ -36,6 +37,7 @@ const CHAVE = "escala-config";
 function CalendarioPage() {
   const qc = useQueryClient();
   const { data: funcionarios = [] } = useQuery({ queryKey: ["funcionarios"], queryFn: listarFuncionarios });
+  const { data: cargos = [] } = useQuery({ queryKey: ["cargos"], queryFn: listarCargos });
   const { data: folgas = [] } = useQuery({ queryKey: ["folgas"], queryFn: listarFolgas });
   const hoje = new Date();
   const [mes, setMes] = useState({ a: hoje.getFullYear(), m: hoje.getMonth() });
@@ -110,6 +112,8 @@ function CalendarioPage() {
         ))}
       </div>
 
+      <LegendaCargos cargos={cargos} />
+
       <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setEscolhido(""); } }}>
         <DialogContent>
           <DialogHeader><DialogTitle>Folgas de {dia && new Date(`${dia}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</DialogTitle></DialogHeader>
@@ -150,6 +154,25 @@ function CalendarioPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+function LegendaCargos({ cargos }: { cargos: Cargo[] }) {
+  if (cargos.length === 0) return null;
+
+  return (
+    <div className="mt-4 flex justify-end">
+      <div className="rounded-xl border bg-card p-3 shadow-sm">
+        <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Legenda</p>
+        <div className="flex flex-wrap justify-end gap-2">
+          {cargos.map((cargo) => (
+            <span key={cargo.id} className="rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: cargo.cor, color: textoSobreCor(cargo.cor) }}>
+              {cargo.nome}
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
