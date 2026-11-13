@@ -21,6 +21,8 @@ export const limitePorCargo: RegraEscala = {
   },
 };
 
+
+
 export const maxFolgasMes: RegraEscala = {
   id: "max-folgas-mes",
   descricao: "Número máximo de folgas por mês",
