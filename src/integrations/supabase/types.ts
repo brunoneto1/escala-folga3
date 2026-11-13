@@ -16,16 +16,19 @@ export type Database = {
     Tables: {
       cargos: {
         Row: {
+          cor: string
           created_at: string
           id: string
           nome: string
         }
         Insert: {
+          cor?: string
           created_at?: string
           id?: string
           nome: string
         }
         Update: {
+          cor?: string
           created_at?: string
           id?: string
           nome?: string

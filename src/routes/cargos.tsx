@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { listarCargos, salvarCargo, excluirCargo, type Cargo } from "@/services/cargos";
 import { listarFuncionarios } from "@/services/funcionarios";
+import { PALETA, sugerirCor } from "@/lib/nomes";
+import { textoSobreCor } from "@/lib/cores";
 
 export const Route = createFileRoute("/cargos")({
   head: () => ({ meta: [
@@ -30,10 +32,11 @@ function CargosPage() {
   const [editando, setEditando] = useState<Cargo | null>(null);
   const [aberto, setAberto] = useState(false);
   const [nome, setNome] = useState("");
+  const [cor, setCor] = useState(PALETA[0]);
   const [excluir, setExcluir] = useState<Cargo | null>(null);
 
   const salvar = useMutation({
-    mutationFn: () => salvarCargo(nome, editando?.id),
+    mutationFn: () => salvarCargo(nome, cor, editando?.id),
     onSuccess: () => { toast.success(editando ? "Cargo atualizado." : "Cargo criado."); setAberto(false); qc.invalidateQueries({ queryKey: ["cargos"] }); qc.invalidateQueries({ queryKey: ["funcionarios"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -43,7 +46,12 @@ function CargosPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const abrir = (c: Cargo | null) => { setEditando(c); setNome(c?.nome ?? ""); setAberto(true); };
+  const abrir = (c: Cargo | null) => {
+    setEditando(c);
+    setNome(c?.nome ?? "");
+    setCor(c?.cor ?? sugerirCor(cargos.map((cargo) => cargo.cor)));
+    setAberto(true);
+  };
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -51,19 +59,24 @@ function CargosPage() {
         action={<Button onClick={() => abrir(null)}><Plus /> Novo cargo</Button>} />
       <div className="rounded-xl border bg-card shadow-sm">
         <Table>
-          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Funcionários</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Cor</TableHead><TableHead>Funcionários</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
           <TableBody>
-            {isLoading ? <TableRow><TableCell colSpan={3} className="text-muted-foreground">Carregando…</TableCell></TableRow>
-            : cargos.length === 0 ? <TableRow><TableCell colSpan={3} className="py-10 text-center text-muted-foreground">Nenhum cargo cadastrado ainda.</TableCell></TableRow>
+            {isLoading ? <TableRow><TableCell colSpan={4} className="text-muted-foreground">Carregando…</TableCell></TableRow>
+            : cargos.length === 0 ? <TableRow><TableCell colSpan={4} className="py-10 text-center text-muted-foreground">Nenhum cargo cadastrado ainda.</TableCell></TableRow>
             : cargos.map((c) => (
               <TableRow key={c.id}>
                 <TableCell className="font-semibold">{c.nome}</TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold" style={{ backgroundColor: c.cor, color: textoSobreCor(c.cor) }}>
+                    <span className="size-2 rounded-full bg-current" />{c.cor}
+                  </span>
+                </TableCell>
                 <TableCell>
                   {funcionariosLoading ? <span className="text-muted-foreground">Carregando…</span> : (
                     <div className="flex flex-wrap gap-x-4 gap-y-1">
                       {funcionarios.filter((f) => f.cargo_id === c.id).map((f) => (
                         <span key={f.id} className="flex items-center gap-2 text-sm">
-                          <span className="size-2.5 rounded-full" style={{ backgroundColor: f.cor }} />
+                          <span className="size-2.5 rounded-full" style={{ backgroundColor: f.cargos?.cor ?? c.cor }} />
                           {f.nome}
                         </span>
                       ))}
@@ -86,6 +99,18 @@ function CargosPage() {
           <DialogHeader><DialogTitle>{editando ? "Editar cargo" : "Novo cargo"}</DialogTitle></DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); salvar.mutate(); }} className="space-y-4">
             <div className="space-y-2"><Label htmlFor="nome">Nome</Label><Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} autoFocus /></div>
+            <div className="space-y-2">
+              <Label>Cor dos funcionários deste cargo</Label>
+              <div className="flex flex-wrap gap-2">
+                {PALETA.map((corPaleta) => (
+                  <button key={corPaleta} type="button" aria-label={`Cor ${corPaleta}`} onClick={() => setCor(corPaleta)}
+                    className="flex size-8 items-center justify-center rounded-full ring-offset-2 ring-offset-background transition hover:scale-110 data-[sel=true]:ring-2 data-[sel=true]:ring-ring"
+                    data-sel={cor === corPaleta} style={{ backgroundColor: corPaleta }}>
+                    {cor === corPaleta && <Check className="size-4" style={{ color: textoSobreCor(corPaleta) }} />}
+                  </button>
+                ))}
+              </div>
+            </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setAberto(false)}>Cancelar</Button>
               <Button type="submit" disabled={salvar.isPending}>Salvar</Button>

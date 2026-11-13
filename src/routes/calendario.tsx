@@ -16,6 +16,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { listarFuncionarios } from "@/services/funcionarios";
 import { listarFolgas, criarFolga, excluirFolga } from "@/services/folgas";
 import { CONFIG_PADRAO, verificarFolga, type ConfigEscala } from "@/rules";
+import { textoSobreCor } from "@/lib/cores";
 
 export const Route = createFileRoute("/calendario")({
   head: () => ({ meta: [
@@ -117,7 +118,7 @@ function CalendarioPage() {
               const fn = porId.get(f.funcionario_id);
               return (
                 <div key={f.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
-                  <span className="flex items-center gap-2 font-semibold"><span className="size-3 rounded-full" style={{ backgroundColor: fn?.cor }} />{fn?.nome}<span className="text-xs font-normal text-muted-foreground">{fn?.cargos?.nome}</span></span>
+                  <span className="flex items-center gap-2 font-semibold"><span className="size-3 rounded-full" style={{ backgroundColor: fn?.cargos?.cor }} /><span className="rounded px-2 py-1" style={{ backgroundColor: fn?.cargos?.cor, color: fn?.cargos?.cor ? textoSobreCor(fn.cargos.cor) : undefined }}>{fn?.nome}</span><span className="text-xs font-normal text-muted-foreground">{fn?.cargos?.nome}</span></span>
                   <Button variant="ghost" size="icon" aria-label="Remover folga" onClick={() => remover.mutate(f.id)}><Trash2 className="text-destructive" /></Button>
                 </div>
               );
@@ -167,7 +168,7 @@ function DiaCelula({ dataIso, numero, hoje, folgas, porId, onClick, lista }: {
         {numero}{lista && <span className="ml-2 font-normal text-muted-foreground">{semana}</span>}
       </span>
       {doDia.map((f) => { const fn = porId.get(f.funcionario_id); return (
-        <span key={f.id} className="truncate rounded px-1.5 py-0.5 text-xs font-semibold text-primary-foreground" style={{ backgroundColor: fn?.cor }}>{fn?.nome}</span>
+        <span key={f.id} className="truncate rounded px-1.5 py-0.5 text-xs font-semibold" style={{ backgroundColor: fn?.cargos?.cor, color: fn?.cargos?.cor ? textoSobreCor(fn.cargos.cor) : undefined }}>{fn?.nome}</span>
       ); })}
     </button>
   );

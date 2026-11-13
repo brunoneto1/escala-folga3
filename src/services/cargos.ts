@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { limparNome, nomeDuplicado } from "@/lib/nomes";
 
-export type Cargo = { id: string; nome: string; created_at: string };
+export type Cargo = { id: string; nome: string; cor: string; created_at: string };
 
 export async function listarCargos(): Promise<Cargo[]> {
   const { data, error } = await supabase.from("cargos").select("*").order("nome");
@@ -16,11 +16,11 @@ async function validar(nome: string, id?: string) {
   return limpo;
 }
 
-export async function salvarCargo(nome: string, id?: string) {
+export async function salvarCargo(nome: string, cor: string, id?: string) {
   const limpo = await validar(nome, id);
   const { error } = id
-    ? await supabase.from("cargos").update({ nome: limpo }).eq("id", id)
-    : await supabase.from("cargos").insert({ nome: limpo });
+    ? await supabase.from("cargos").update({ nome: limpo, cor }).eq("id", id)
+    : await supabase.from("cargos").insert({ nome: limpo, cor });
   if (error) throw new Error(error.code === "23505" ? `Já existe um cargo chamado "${limpo}".` : "Não foi possível salvar o cargo.");
 }
 
