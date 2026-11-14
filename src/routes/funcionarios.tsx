@@ -64,7 +64,7 @@ function FuncionariosPage() {
             : funcionarios.length === 0 ? <TableRow><TableCell colSpan={3} className="py-10 text-center text-muted-foreground">Nenhum funcionário cadastrado ainda.</TableCell></TableRow>
             : funcionarios.map((f) => (
               <TableRow key={f.id}>
-                <TableCell><span className="flex items-center gap-3 font-semibold"><span className="size-3.5 rounded-full ring-2 ring-background" style={{ backgroundColor: f.cargos?.cor }} /><span className="rounded-md px-2 py-1" style={{ backgroundColor: f.cargos?.cor, color: f.cargos?.cor ? textoSobreCor(f.cargos.cor) : undefined }}>{f.nome}</span></span></TableCell>
+                <TableCell><span className="flex min-w-0 items-center gap-3 font-semibold"><span className="size-3.5 shrink-0 rounded-full ring-2 ring-background" style={{ backgroundColor: f.cargos?.cor }} /><span className="min-w-0 rounded-md px-2 py-1 [overflow-wrap:anywhere]" style={{ backgroundColor: f.cargos?.cor, color: f.cargos?.cor ? textoSobreCor(f.cargos.cor) : undefined }}>{f.nome}</span></span></TableCell>
                 <TableCell className="text-muted-foreground">{f.cargos?.nome ?? "—"}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => abrir(f)}><Pencil /></Button>
