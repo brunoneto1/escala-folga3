@@ -19,7 +19,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <SidebarHeader className="px-4 py-5">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-extrabold text-sidebar-primary-foreground">F</div>
-            <span className="truncate text-base font-bold group-data-[collapsible=icon]:hidden">Escala de Folgas</span>
+            <span className="truncate text-base font-bold group-data-[collapsible=icon]:hidden">Gestor de escala</span>
           </div>
         </SidebarHeader>
         <SidebarContent>
