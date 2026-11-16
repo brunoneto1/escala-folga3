@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\candidate.json",
+    "sha256": "8d67c6773fc1b75e70eefe11d9072c1e9e953fac89e590d00bd1de509007277a",
+    "bytes": 38203
+  },
+  "artifact": {
+    "path": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\arquitetura-escala.html",
+    "sha256": "627094d0bc410c7bdf645262725e56e6353ce94c9e9654f3c52ad0098df5b25f",
+    "bytes": 853828
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\review-3\\arquitetura-escala.finalize.json",
+    "summaryReceipt": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\review-3\\arquitetura-escala.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\review-3\\arquitetura-escala.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-16T12:32:54.999Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 7004,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

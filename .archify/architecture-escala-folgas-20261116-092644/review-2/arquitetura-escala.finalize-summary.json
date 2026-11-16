@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\candidate.json",
+    "sha256": "a8a832f66c1266759bd4f53914246d671bb34ac7642e22ffc18a773bef8775be",
+    "bytes": 36836
+  },
+  "artifact": {
+    "path": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\arquitetura-escala.html",
+    "sha256": "efd1c5ea8fc12cd1f1599ab365175dc7e21896ced0c66fde6f88e4a4b9d6a289",
+    "bytes": 853689
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [
+    {
+      "code": "i18n/translation-coverage",
+      "severity": "warning",
+      "message": "meta.locale \"pt-BR\" resolves 461/486 renderer-owned messages (94%) from 461 meta.translations entries; 25 fall back to English.",
+      "subject": {
+        "diagramType": "architecture",
+        "path": "/meta/translations"
+      },
+      "evidence": {
+        "locale": "pt-BR",
+        "resolvedLocale": "pt-BR",
+        "bundledLocale": null,
+        "translatedKeys": 461,
+        "totalKeys": 486,
+        "appliedOverrideKeys": 461,
+        "missingKeys": [
+          "viewer.export.svg.auto",
+          "viewer.export.svg.auto.hint",
+          "viewer.export.svg.light",
+          "viewer.export.svg.light.hint",
+          "viewer.export.svg.dark",
+          "viewer.export.svg.dark.hint",
+          "viewer.guide.title",
+          "viewer.focus.selectedNodes",
+          "viewer.guide.credit",
+          "viewer.guide.star"
+        ],
+        "missingKeysTotal": 25,
+        "englishSource": {
+          "viewer.export.svg.auto": "SVG · Auto",
+          "viewer.export.svg.auto.hint": "Matches host theme",
+          "viewer.export.svg.light": "SVG · Light",
+          "viewer.export.svg.light.hint": "Always light",
+          "viewer.export.svg.dark": "SVG · Dark",
+          "viewer.export.svg.dark.hint": "Always dark",
+          "viewer.guide.title": "Explore this system",
+          "viewer.focus.selectedNodes": "{count} selected nodes",
+          "viewer.guide.credit": "Find Archify useful? A star on GitHub helps",
+          "viewer.guide.star": "Star"
+        }
+      },
+      "supportedFixes": [
+        "Add each missing key to meta.translations, translating its English source string and keeping its {placeholders}."
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\review-2\\arquitetura-escala.finalize.json",
+    "summaryReceipt": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\review-2\\arquitetura-escala.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\review-2\\arquitetura-escala.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-16T12:32:54.999Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 6110,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

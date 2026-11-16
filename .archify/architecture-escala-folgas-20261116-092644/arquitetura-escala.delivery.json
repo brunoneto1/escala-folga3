@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "d404207e-1832-4921-a0ad-acbac8291d7e",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\candidate.json",
+  "output": "C:\\Users\\BRUNO\\Projects\\escala-teste1\\.archify\\architecture-escala-folgas-20261116-092644\\arquitetura-escala.html",
+  "specification": {
+    "sha256": "8d67c6773fc1b75e70eefe11d9072c1e9e953fac89e590d00bd1de509007277a",
+    "bytes": 38203
+  },
+  "artifact": {
+    "sha256": "627094d0bc410c7bdf645262725e56e6353ce94c9e9654f3c52ad0098df5b25f",
+    "bytes": 853828
+  }
+}
