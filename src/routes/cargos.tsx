@@ -59,32 +59,29 @@ function CargosPage() {
         action={<Button onClick={() => abrir(null)}><Plus /> Novo cargo</Button>} />
       <div className="rounded-xl border bg-card shadow-sm">
         <Table>
-          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Cor</TableHead><TableHead>Funcionários</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead className="w-48 min-w-48">Nome</TableHead><TableHead>Funcionários</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
           <TableBody>
-            {isLoading ? <TableRow><TableCell colSpan={4} className="text-muted-foreground">Carregando…</TableCell></TableRow>
-            : cargos.length === 0 ? <TableRow><TableCell colSpan={4} className="py-10 text-center text-muted-foreground">Nenhum cargo cadastrado ainda.</TableCell></TableRow>
+            {isLoading ? <TableRow><TableCell colSpan={3} className="text-muted-foreground">Carregando…</TableCell></TableRow>
+            : cargos.length === 0 ? <TableRow><TableCell colSpan={3} className="py-10 text-center text-muted-foreground">Nenhum cargo cadastrado ainda.</TableCell></TableRow>
             : cargos.map((c) => (
               <TableRow key={c.id}>
-                <TableCell className="font-semibold">{c.nome}</TableCell>
-                <TableCell>
-                  <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold" style={{ backgroundColor: c.cor, color: textoSobreCor(c.cor) }}>
-                    <span className="size-2 rounded-full bg-current" />{c.cor}
+                <TableCell className="align-top">
+                  <span className="inline-flex whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold" style={{ backgroundColor: c.cor, color: textoSobreCor(c.cor) }}>
+                    {c.nome}
                   </span>
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   {funcionariosLoading ? <span className="text-muted-foreground">Carregando…</span> : (
-                    <div className="flex flex-wrap gap-x-4 gap-y-1">
-                      {funcionarios.filter((f) => f.cargo_id === c.id).map((f) => (
-                        <span key={f.id} className="flex items-center gap-2 text-sm">
-                          <span className="size-2.5 rounded-full" style={{ backgroundColor: f.cargos?.cor ?? c.cor }} />
-                          {f.nome}
-                        </span>
-                      ))}
-                      {funcionarios.every((f) => f.cargo_id !== c.id) && <span className="text-sm text-muted-foreground">Nenhum funcionário</span>}
-                    </div>
+                    funcionarios.every((f) => f.cargo_id !== c.id) ? <span className="text-sm text-muted-foreground">Nenhum funcionário</span> : (
+                      <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+                        {funcionarios.filter((f) => f.cargo_id === c.id).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")).map((f) => (
+                          <span key={f.id} className="min-w-0 border-b border-border/60 py-1 text-sm [overflow-wrap:anywhere]">{f.nome}</span>
+                        ))}
+                      </div>
+                    )
                   )}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="align-top text-right">
                   <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => abrir(c)}><Pencil /></Button>
                   <Button variant="ghost" size="icon" aria-label="Excluir" onClick={() => setExcluir(c)}><Trash2 className="text-destructive" /></Button>
                 </TableCell>

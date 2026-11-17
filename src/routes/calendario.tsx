@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, ChevronLeft, ChevronRight, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -47,6 +48,9 @@ function CalendarioPage() {
   const [dia, setDia] = useState<string | null>(null);
   const [escolhido, setEscolhido] = useState("");
   const [tipoEscolhido, setTipoEscolhido] = useState("");
+  const [buscaFuncionario, setBuscaFuncionario] = useState("");
+  const [seletorFuncionarioAberto, setSeletorFuncionarioAberto] = useState(false);
+  const [cargosAbertos, setCargosAbertos] = useState<string[]>([]);
   const [avisos, setAvisos] = useState<string[]>([]);
 
   useEffect(() => { try { const s = localStorage.getItem(CHAVE); if (s) setConfig({ ...CONFIG_PADRAO, ...JSON.parse(s) }); } catch { /* ignore */ } }, []);
@@ -62,6 +66,25 @@ function CalendarioPage() {
 
   const doDia = dia ? folgas.filter((f) => f.data === dia) : [];
   const disponiveis = funcionarios.filter((f) => !doDia.some((x) => x.funcionario_id === f.id));
+  const gruposDisponiveis = useMemo(() => {
+    const grupos = new Map<string, { id: string; nome: string; funcionarios: typeof funcionarios }>();
+    disponiveis.forEach((f) => {
+      const id = f.cargo_id ?? "__sem_cargo__";
+      const grupo = grupos.get(id) ?? { id, nome: f.cargos?.nome ?? "Sem cargo", funcionarios: [] as typeof funcionarios };
+      grupo.funcionarios.push(f);
+      grupos.set(id, grupo);
+    });
+    return Array.from(grupos.values())
+      .map((grupo) => ({ ...grupo, funcionarios: grupo.funcionarios.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")) }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  }, [disponiveis]);
+  const termoBuscaFuncionario = buscaFuncionario.trim().toLocaleLowerCase("pt-BR");
+  const gruposVisiveis = useMemo(() => gruposDisponiveis
+    .map((grupo) => ({
+      ...grupo,
+      funcionarios: grupo.funcionarios.filter((f) => f.nome.toLocaleLowerCase("pt-BR").includes(termoBuscaFuncionario)),
+    }))
+    .filter((grupo) => grupo.funcionarios.length > 0), [gruposDisponiveis, termoBuscaFuncionario]);
 
   const atualizar = () => qc.invalidateQueries({ queryKey: ["folgas"] });
   const adicionar = useMutation({
@@ -122,7 +145,7 @@ function CalendarioPage() {
 
       <LegendaCargos cargos={cargos} tipos={tiposFolga} />
 
-      <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setEscolhido(""); setTipoEscolhido(""); } }}>
+      <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setEscolhido(""); setTipoEscolhido(""); setSeletorFuncionarioAberto(false); setBuscaFuncionario(""); } }}>
         <DialogContent className="flex w-[calc(100%-2rem)] max-w-2xl min-w-0 max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-4 sm:p-6">
           <DialogHeader className="min-w-0 shrink-0 pr-8">
             <DialogTitle className="min-w-0 break-words">Folgas de {dia && new Date(`${dia}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</DialogTitle>
@@ -164,10 +187,48 @@ function CalendarioPage() {
           </div>
           {funcionarios.length === 0 ? <p className="min-w-0 text-sm text-muted-foreground">Cadastre funcionários para marcar folgas.</p> : (
             <DialogFooter className="w-full min-w-0 flex-col gap-2 sm:flex-row sm:justify-start sm:space-x-0">
-              <Select value={escolhido} onValueChange={setEscolhido}>
-                <SelectTrigger className="w-full min-w-0 sm:flex-1"><SelectValue placeholder="Escolha um funcionário" /></SelectTrigger>
-                <SelectContent className="w-[var(--radix-select-trigger-width)]">{disponiveis.map((f) => <SelectItem key={f.id} value={f.id}><span className="min-w-0 [overflow-wrap:anywhere]">{f.nome} — {f.cargos?.nome}</span></SelectItem>)}</SelectContent>
-              </Select>
+              <Popover open={seletorFuncionarioAberto} onOpenChange={(aberto) => { setSeletorFuncionarioAberto(aberto); if (!aberto) setBuscaFuncionario(""); }}>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="outline" className="w-full min-w-0 justify-between font-normal sm:flex-1">
+                    <span className="min-w-0 truncate">{porId.get(escolhido)?.nome ?? "Escolha um funcionário"}</span>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-[min(28rem,calc(100vw-2rem))] min-w-0 p-0">
+                  <div className="relative border-b p-2">
+                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input autoFocus aria-label="Buscar funcionário" value={buscaFuncionario} onChange={(e) => setBuscaFuncionario(e.target.value)} placeholder="Buscar funcionário..." className="h-9 pl-8" />
+                  </div>
+                  {gruposVisiveis.length === 0 ? (
+                    <p className="px-3 py-4 text-center text-sm text-muted-foreground">
+                      {disponiveis.length === 0 ? "Todos os funcionários já estão de folga neste dia." : "Nenhum funcionário encontrado."}
+                    </p>
+                  ) : (
+                    <Accordion type="multiple" value={termoBuscaFuncionario ? gruposVisiveis.map((grupo) => grupo.id) : cargosAbertos} onValueChange={setCargosAbertos} className="max-h-[min(60vh,28rem)] overflow-y-auto px-2">
+                      {gruposVisiveis.map((grupo) => (
+                        <AccordionItem key={grupo.id} value={grupo.id} className="border-b border-border/60">
+                          <AccordionTrigger className="py-3 hover:no-underline">
+                            <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                              <span className="min-w-0 truncate text-left">{grupo.nome}</span>
+                              <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{grupo.funcionarios.length}</span>
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-2">
+                            <div className="space-y-1">
+                              {grupo.funcionarios.map((f) => (
+                                <Button key={f.id} type="button" variant={escolhido === f.id ? "secondary" : "ghost"} className="w-full min-w-0 justify-between text-left" onClick={() => { setEscolhido(f.id); setSeletorFuncionarioAberto(false); setBuscaFuncionario(""); }}>
+                                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">{f.nome}</span>
+                                  {escolhido === f.id && <Check className="shrink-0" aria-hidden="true" />}
+                                </Button>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  )}
+                </PopoverContent>
+              </Popover>
               <select
                 id="tipo-folga"
                 aria-label="Tipo de folga"
