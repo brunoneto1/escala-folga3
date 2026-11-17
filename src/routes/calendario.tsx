@@ -15,7 +15,8 @@ import {
 import { PageHeader } from "@/components/PageHeader";
 import { listarCargos, type Cargo } from "@/services/cargos";
 import { listarFuncionarios } from "@/services/funcionarios";
-import { listarFolgas, criarFolga, excluirFolga } from "@/services/folgas";
+import { listarFolgas, criarFolga, excluirFolga, atualizarTipoFolga } from "@/services/folgas";
+import { listarTiposFolga } from "@/services/tiposFolga";
 import { CONFIG_PADRAO, verificarFolga, type ConfigEscala } from "@/rules";
 import { textoSobreCor } from "@/lib/cores";
 
@@ -39,11 +40,13 @@ function CalendarioPage() {
   const { data: funcionarios = [] } = useQuery({ queryKey: ["funcionarios"], queryFn: listarFuncionarios });
   const { data: cargos = [] } = useQuery({ queryKey: ["cargos"], queryFn: listarCargos });
   const { data: folgas = [] } = useQuery({ queryKey: ["folgas"], queryFn: listarFolgas });
+  const { data: tiposFolga = [] } = useQuery({ queryKey: ["tipos-folga"], queryFn: listarTiposFolga });
   const hoje = new Date();
   const [mes, setMes] = useState({ a: hoje.getFullYear(), m: hoje.getMonth() });
   const [config, setConfig] = useState<ConfigEscala>(CONFIG_PADRAO);
   const [dia, setDia] = useState<string | null>(null);
   const [escolhido, setEscolhido] = useState("");
+  const [tipoEscolhido, setTipoEscolhido] = useState("");
   const [avisos, setAvisos] = useState<string[]>([]);
 
   useEffect(() => { try { const s = localStorage.getItem(CHAVE); if (s) setConfig({ ...CONFIG_PADRAO, ...JSON.parse(s) }); } catch { /* ignore */ } }, []);
@@ -62,13 +65,18 @@ function CalendarioPage() {
 
   const atualizar = () => qc.invalidateQueries({ queryKey: ["folgas"] });
   const adicionar = useMutation({
-    mutationFn: () => criarFolga(escolhido, dia!),
-    onSuccess: () => { toast.success("Folga marcada."); setEscolhido(""); setAvisos([]); atualizar(); },
+    mutationFn: () => criarFolga(escolhido, dia!, tipoEscolhido || null),
+    onSuccess: () => { toast.success("Folga marcada."); setEscolhido(""); setTipoEscolhido(""); setAvisos([]); atualizar(); },
     onError: (e: Error) => toast.error(e.message),
   });
   const remover = useMutation({
     mutationFn: excluirFolga,
     onSuccess: () => { toast.success("Folga removida."); atualizar(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const alterarTipo = useMutation({
+    mutationFn: ({ id, tipo_id }: { id: string; tipo_id: string | null }) => atualizarTipoFolga(id, tipo_id),
+    onSuccess: () => { toast.success("Tipo de folga atualizado."); atualizar(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -112,9 +120,9 @@ function CalendarioPage() {
         ))}
       </div>
 
-      <LegendaCargos cargos={cargos} />
+      <LegendaCargos cargos={cargos} tipos={tiposFolga} />
 
-      <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setEscolhido(""); } }}>
+      <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setEscolhido(""); setTipoEscolhido(""); } }}>
         <DialogContent>
           <DialogHeader><DialogTitle>Folgas de {dia && new Date(`${dia}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</DialogTitle></DialogHeader>
           <div className="space-y-2">
@@ -126,6 +134,21 @@ function CalendarioPage() {
                     <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: fn?.cargos?.cor }} />
                     <span className="min-w-0 rounded px-2 py-1 [overflow-wrap:anywhere]" style={{ backgroundColor: fn?.cargos?.cor, color: fn?.cargos?.cor ? textoSobreCor(fn.cargos.cor) : undefined }}>{fn?.nome}</span>
                     <span className="min-w-0 max-w-28 truncate text-xs font-normal text-muted-foreground">{fn?.cargos?.nome}</span>
+                    <span className="relative inline-flex shrink-0 rounded-md focus-within:ring-2 focus-within:ring-ring">
+                      <span aria-hidden="true" className={`inline-flex min-w-8 justify-center rounded-md border border-dashed px-1.5 py-1 text-[10px] font-semibold leading-none ${f.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
+                        {f.tipo?.sigla ?? "+ tipo"}
+                      </span>
+                      <select
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        value={f.tipo_id ?? ""}
+                        aria-label={`Trocar tipo da folga de ${fn?.nome ?? "funcionário"}`}
+                        title={f.tipo ? `Tipo atual: ${f.tipo.nome}` : "Adicionar tipo à folga"}
+                        onChange={(e) => alterarTipo.mutate({ id: f.id, tipo_id: e.target.value || null })}
+                      >
+                        <option value="">Folga comum</option>
+                        {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
+                      </select>
+                    </span>
                   </span>
                   <Button variant="ghost" size="icon" className="shrink-0" aria-label="Remover folga" onClick={() => remover.mutate(f.id)}><Trash2 className="text-destructive" /></Button>
                 </div>
@@ -138,6 +161,16 @@ function CalendarioPage() {
                 <SelectTrigger className="flex-1"><SelectValue placeholder="Escolha um funcionário" /></SelectTrigger>
                 <SelectContent className="w-[var(--radix-select-trigger-width)]">{disponiveis.map((f) => <SelectItem key={f.id} value={f.id}><span className="min-w-0 [overflow-wrap:anywhere]">{f.nome} — {f.cargos?.nome}</span></SelectItem>)}</SelectContent>
               </Select>
+              <select
+                id="tipo-folga"
+                aria-label="Tipo de folga"
+                className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:max-w-48"
+                value={tipoEscolhido}
+                onChange={(e) => setTipoEscolhido(e.target.value)}
+              >
+                <option value="">Folga comum</option>
+                {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
+              </select>
               <Button onClick={tentarAdicionar} disabled={!escolhido || adicionar.isPending}>Marcar folga</Button>
             </DialogFooter>
           )}
@@ -162,19 +195,38 @@ function CalendarioPage() {
   );
 }
 
-function LegendaCargos({ cargos }: { cargos: Cargo[] }) {
-  if (cargos.length === 0) return null;
+function LegendaCargos({ cargos, tipos }: { cargos: Cargo[]; tipos: Awaited<ReturnType<typeof listarTiposFolga>> }) {
+  if (cargos.length === 0 && tipos.length === 0) return null;
 
   return (
     <div className="mt-4 flex justify-end">
       <div className="rounded-xl border bg-card p-3 shadow-sm">
         <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Legenda</p>
-        <div className="flex flex-wrap justify-end gap-2">
-          {cargos.map((cargo) => (
-            <span key={cargo.id} className="rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: cargo.cor, color: textoSobreCor(cargo.cor) }}>
-              {cargo.nome}
-            </span>
-          ))}
+        <div className="flex flex-wrap justify-end gap-x-5 gap-y-3">
+          {cargos.length > 0 && (
+            <div>
+              <p className="mb-1.5 text-right text-[10px] font-semibold uppercase text-muted-foreground">Cargos</p>
+              <div className="flex flex-wrap justify-end gap-2">
+                {cargos.map((cargo) => (
+                  <span key={cargo.id} className="rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: cargo.cor, color: textoSobreCor(cargo.cor) }}>
+                    {cargo.nome}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {tipos.length > 0 && (
+            <div className={cargos.length > 0 ? "border-l pl-5" : ""}>
+              <p className="mb-1.5 text-right text-[10px] font-semibold uppercase text-muted-foreground">Tipos de folga</p>
+              <div className="flex flex-wrap justify-end gap-2">
+                {tipos.map((tipo) => (
+                  <span key={tipo.id} className="rounded-md border border-dashed px-2 py-1 text-xs font-semibold text-foreground">
+                    {tipo.sigla} — {tipo.nome}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -183,7 +235,7 @@ function LegendaCargos({ cargos }: { cargos: Cargo[] }) {
 
 type Fn = Awaited<ReturnType<typeof listarFuncionarios>>[number];
 function DiaCelula({ dataIso, numero, hoje, folgas, porId, onClick, lista }: {
-  dataIso: string; numero: number; hoje: string; folgas: { id: string; funcionario_id: string; data: string }[];
+  dataIso: string; numero: number; hoje: string; folgas: Awaited<ReturnType<typeof listarFolgas>>;
   porId: Map<string, Fn>; onClick: (d: string) => void; lista?: boolean;
 }) {
   const doDia = folgas.filter((f) => f.data === dataIso);
@@ -195,7 +247,7 @@ function DiaCelula({ dataIso, numero, hoje, folgas, porId, onClick, lista }: {
         {numero}{lista && <span className="ml-2 font-normal text-muted-foreground">{semana}</span>}
       </span>
       {doDia.map((f) => { const fn = porId.get(f.funcionario_id); return (
-        <span key={f.id} className="truncate rounded px-1.5 py-0.5 text-xs font-semibold" style={{ backgroundColor: fn?.cargos?.cor, color: fn?.cargos?.cor ? textoSobreCor(fn.cargos.cor) : undefined }}>{fn?.nome}</span>
+        <span key={f.id} className="truncate rounded px-1.5 py-0.5 text-xs font-semibold" style={{ backgroundColor: fn?.cargos?.cor, color: fn?.cargos?.cor ? textoSobreCor(fn.cargos.cor) : undefined }}>{f.tipo?.sigla && <span className="mr-1">{f.tipo.sigla}</span>}{fn?.nome}</span>
       ); })}
     </button>
   );

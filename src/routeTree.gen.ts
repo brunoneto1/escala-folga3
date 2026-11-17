@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as CargosRouteImport } from './routes/cargos'
 import { Route as FuncionariosRouteImport } from './routes/funcionarios'
+import { Route as TiposFolgaRouteImport } from './routes/tipos-folga'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const FuncionariosRoute = FuncionariosRouteImport.update({
   path: '/funcionarios',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TiposFolgaRoute = TiposFolgaRouteImport.update({
+  id: '/tipos-folga',
+  path: '/tipos-folga',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/cargos': typeof CargosRoute
   '/funcionarios': typeof FuncionariosRoute
+  '/tipos-folga': typeof TiposFolgaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/cargos': typeof CargosRoute
   '/funcionarios': typeof FuncionariosRoute
+  '/tipos-folga': typeof TiposFolgaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/calendario': typeof CalendarioRoute
   '/cargos': typeof CargosRoute
   '/funcionarios': typeof FuncionariosRoute
+  '/tipos-folga': typeof TiposFolgaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calendario' | '/cargos' | '/funcionarios'
+  fullPaths: '/' | '/calendario' | '/cargos' | '/funcionarios' | '/tipos-folga'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendario' | '/cargos' | '/funcionarios'
-  id: '__root__' | '/' | '/calendario' | '/cargos' | '/funcionarios'
+  to: '/' | '/calendario' | '/cargos' | '/funcionarios' | '/tipos-folga'
+  id:
+    | '__root__'
+    | '/'
+    | '/calendario'
+    | '/cargos'
+    | '/funcionarios'
+    | '/tipos-folga'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +82,7 @@ export interface RootRouteChildren {
   CalendarioRoute: typeof CalendarioRoute
   CargosRoute: typeof CargosRoute
   FuncionariosRoute: typeof FuncionariosRoute
+  TiposFolgaRoute: typeof TiposFolgaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FuncionariosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tipos-folga': {
+      id: '/tipos-folga'
+      path: '/tipos-folga'
+      fullPath: '/tipos-folga'
+      preLoaderRoute: typeof TiposFolgaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarioRoute: CalendarioRoute,
   CargosRoute: CargosRoute,
   FuncionariosRoute: FuncionariosRoute,
+  TiposFolgaRoute: TiposFolgaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

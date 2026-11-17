@@ -41,18 +41,21 @@ export type Database = {
           data: string
           funcionario_id: string
           id: string
+          tipo_id: string | null
         }
         Insert: {
           created_at?: string
           data: string
           funcionario_id: string
           id?: string
+          tipo_id?: string | null
         }
         Update: {
           created_at?: string
           data?: string
           funcionario_id?: string
           id?: string
+          tipo_id?: string | null
         }
         Relationships: [
           {
@@ -60,6 +63,13 @@ export type Database = {
             columns: ["funcionario_id"]
             isOneToOne: false
             referencedRelation: "funcionarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folgas_tipo_id_fkey"
+            columns: ["tipo_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_folga"
             referencedColumns: ["id"]
           },
         ]
@@ -95,6 +105,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tipos_folga: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          sigla: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          sigla: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          sigla?: string
+        }
+        Relationships: []
       }
     }
     Views: {

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, Users, Briefcase } from "lucide-react";
+import { CalendarDays, Users, Briefcase, Tag } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
@@ -10,6 +10,7 @@ const itens = [
   { to: "/calendario", label: "Calendário", icon: CalendarDays },
   { to: "/funcionarios", label: "Funcionários", icon: Users },
   { to: "/cargos", label: "Cargos", icon: Briefcase },
+  { to: "/tipos-folga", label: "Tipos de folga", icon: Tag },
 ] as const;
 
 export function AppLayout({ children }: { children: ReactNode }) {
