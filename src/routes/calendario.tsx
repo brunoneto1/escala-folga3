@@ -123,19 +123,26 @@ function CalendarioPage() {
       <LegendaCargos cargos={cargos} tipos={tiposFolga} />
 
       <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setEscolhido(""); setTipoEscolhido(""); } }}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Folgas de {dia && new Date(`${dia}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</DialogTitle></DialogHeader>
-          <div className="space-y-2">
-            {doDia.length === 0 ? <p className="text-sm text-muted-foreground">Ninguém de folga neste dia.</p> : doDia.map((f) => {
+        <DialogContent className="flex w-[calc(100%-2rem)] max-w-2xl min-w-0 max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-4 sm:p-6">
+          <DialogHeader className="min-w-0 shrink-0 pr-8">
+            <DialogTitle className="min-w-0 break-words">Folgas de {dia && new Date(`${dia}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</DialogTitle>
+          </DialogHeader>
+          <div className="min-h-0 min-w-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1 max-h-[55vh]">
+            {doDia.length === 0 ? <p className="min-w-0 text-sm text-muted-foreground">Ninguém de folga neste dia.</p> : doDia.map((f) => {
               const fn = porId.get(f.funcionario_id);
               return (
-                <div key={f.id} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2">
-                  <span className="flex min-w-0 flex-1 items-center gap-2 font-semibold">
-                    <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: fn?.cargos?.cor }} />
-                    <span className="min-w-0 rounded px-2 py-1 [overflow-wrap:anywhere]" style={{ backgroundColor: fn?.cargos?.cor, color: fn?.cargos?.cor ? textoSobreCor(fn.cargos.cor) : undefined }}>{fn?.nome}</span>
-                    <span className="min-w-0 max-w-28 truncate text-xs font-normal text-muted-foreground">{fn?.cargos?.nome}</span>
-                    <span className="relative inline-flex shrink-0 rounded-md focus-within:ring-2 focus-within:ring-ring">
-                      <span aria-hidden="true" className={`inline-flex min-w-8 justify-center rounded-md border border-dashed px-1.5 py-1 text-[10px] font-semibold leading-none ${f.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
+                <div key={f.id} className="grid min-w-0 grid-cols-1 gap-2 rounded-lg border px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere] font-semibold text-foreground">{fn?.nome}</span>
+                    {fn?.cargos && (
+                      <span className="max-w-full break-words [overflow-wrap:anywhere] rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: fn.cargos.cor, color: textoSobreCor(fn.cargos.cor) }}>
+                        {fn.cargos.nome}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex min-w-0 shrink-0 items-center justify-end gap-2">
+                    <span className="relative inline-flex shrink-0 cursor-pointer rounded-md transition-colors hover:bg-muted/50 focus-within:ring-2 focus-within:ring-ring">
+                      <span aria-hidden="true" className={`inline-flex min-w-12 justify-center rounded-md border border-dashed px-2.5 py-1.5 text-xs font-semibold leading-none ${f.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
                         {f.tipo?.sigla ?? "+ tipo"}
                       </span>
                       <select
@@ -149,29 +156,29 @@ function CalendarioPage() {
                         {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
                       </select>
                     </span>
-                  </span>
-                  <Button variant="ghost" size="icon" className="shrink-0" aria-label="Remover folga" onClick={() => remover.mutate(f.id)}><Trash2 className="text-destructive" /></Button>
+                    <Button variant="ghost" size="icon" className="shrink-0" aria-label="Remover folga" onClick={() => remover.mutate(f.id)}><Trash2 className="text-destructive" /></Button>
+                  </div>
                 </div>
               );
             })}
           </div>
-          {funcionarios.length === 0 ? <p className="text-sm text-muted-foreground">Cadastre funcionários para marcar folgas.</p> : (
-            <DialogFooter className="gap-2 sm:justify-start">
+          {funcionarios.length === 0 ? <p className="min-w-0 text-sm text-muted-foreground">Cadastre funcionários para marcar folgas.</p> : (
+            <DialogFooter className="w-full min-w-0 flex-col gap-2 sm:flex-row sm:justify-start sm:space-x-0">
               <Select value={escolhido} onValueChange={setEscolhido}>
-                <SelectTrigger className="flex-1"><SelectValue placeholder="Escolha um funcionário" /></SelectTrigger>
+                <SelectTrigger className="w-full min-w-0 sm:flex-1"><SelectValue placeholder="Escolha um funcionário" /></SelectTrigger>
                 <SelectContent className="w-[var(--radix-select-trigger-width)]">{disponiveis.map((f) => <SelectItem key={f.id} value={f.id}><span className="min-w-0 [overflow-wrap:anywhere]">{f.nome} — {f.cargos?.nome}</span></SelectItem>)}</SelectContent>
               </Select>
               <select
                 id="tipo-folga"
                 aria-label="Tipo de folga"
-                className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:max-w-48"
+                className="h-9 w-full min-w-0 cursor-pointer rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:flex-1"
                 value={tipoEscolhido}
                 onChange={(e) => setTipoEscolhido(e.target.value)}
               >
                 <option value="">Folga comum</option>
                 {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
               </select>
-              <Button onClick={tentarAdicionar} disabled={!escolhido || adicionar.isPending}>Marcar folga</Button>
+              <Button className="w-full min-w-0 sm:w-auto sm:shrink-0" onClick={tentarAdicionar} disabled={!escolhido || adicionar.isPending}>Marcar folga</Button>
             </DialogFooter>
           )}
         </DialogContent>

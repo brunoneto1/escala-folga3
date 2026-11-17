@@ -5,7 +5,7 @@
  *   build resolves @import from the filesystem. Load those with a <link> in the head() of
  *   src/routes/__root.tsx and name the family in a --font-* token in @theme inline below.
  */
-@import "tailwindcss" source (none);
+@import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
 
