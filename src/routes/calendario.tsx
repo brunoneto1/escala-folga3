@@ -135,14 +135,14 @@ function CalendarioPage() {
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere] font-semibold text-foreground">{fn?.nome}</span>
                     {fn?.cargos && (
-                      <span className="max-w-full break-words [overflow-wrap:anywhere] rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: fn.cargos.cor, color: textoSobreCor(fn.cargos.cor) }}>
+                      <span className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: fn.cargos.cor, color: textoSobreCor(fn.cargos.cor) }}>
                         {fn.cargos.nome}
                       </span>
                     )}
                   </div>
                   <div className="flex min-w-0 shrink-0 items-center justify-end gap-2">
-                    <span className="relative inline-flex shrink-0 cursor-pointer rounded-md transition-colors hover:bg-muted/50 focus-within:ring-2 focus-within:ring-ring">
-                      <span aria-hidden="true" className={`inline-flex min-w-12 justify-center rounded-md border border-dashed px-2.5 py-1.5 text-xs font-semibold leading-none ${f.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span className="relative inline-flex w-14 min-w-0 shrink-0 cursor-pointer rounded-md transition-colors hover:bg-muted/50 focus-within:ring-2 focus-within:ring-ring">
+                      <span aria-hidden="true" className={`flex w-full min-w-0 justify-center overflow-hidden rounded-md border border-dashed px-2.5 py-1.5 text-xs font-semibold leading-none ${f.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
                         {f.tipo?.sigla ?? "+ tipo"}
                       </span>
                       <select
@@ -156,7 +156,7 @@ function CalendarioPage() {
                         {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
                       </select>
                     </span>
-                    <Button variant="ghost" size="icon" className="shrink-0" aria-label="Remover folga" onClick={() => remover.mutate(f.id)}><Trash2 className="text-destructive" /></Button>
+                    <Button variant="ghost" size="icon" className="min-w-0 shrink-0" aria-label="Remover folga" onClick={() => remover.mutate(f.id)}><Trash2 className="text-destructive" /></Button>
                   </div>
                 </div>
               );
