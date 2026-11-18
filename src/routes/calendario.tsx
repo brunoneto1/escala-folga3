@@ -1,14 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Check, ChevronDown, ChevronLeft, ChevronRight, Search, Trash2 } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -47,11 +45,9 @@ function CalendarioPage() {
   const [visao, setVisao] = useState<"calendario" | "tabela">("calendario");
   const [config, setConfig] = useState<ConfigEscala>(CONFIG_PADRAO);
   const [dia, setDia] = useState<string | null>(null);
-  const [escolhido, setEscolhido] = useState("");
-  const [tipoEscolhido, setTipoEscolhido] = useState("");
-  const [buscaFuncionario, setBuscaFuncionario] = useState("");
-  const [seletorFuncionarioAberto, setSeletorFuncionarioAberto] = useState(false);
-  const [cargosAbertos, setCargosAbertos] = useState<string[]>([]);
+  const [funcionarioPendenteId, setFuncionarioPendenteId] = useState<string | null>(null);
+  const [tipoAoMarcar, setTipoAoMarcar] = useState("");
+  const [buscaFuncionariosDia, setBuscaFuncionariosDia] = useState("");
   const [avisos, setAvisos] = useState<string[]>([]);
 
   useEffect(() => { try { const s = localStorage.getItem(CHAVE); if (s) setConfig({ ...CONFIG_PADRAO, ...JSON.parse(s) }); } catch { /* ignore */ } }, []);
@@ -64,35 +60,30 @@ function CalendarioPage() {
   const celulas = [...Array(inicio).fill(null), ...Array.from({ length: total }, (_, i) => i + 1)];
   const titulo = new Date(mes.a, mes.m, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
   const andar = (n: number) => { const d = new Date(mes.a, mes.m + n, 1); setMes({ a: d.getFullYear(), m: d.getMonth() }); };
-  const abrirDia = (data: string, funcionarioId?: string) => { setEscolhido(funcionarioId ?? ""); setTipoEscolhido(""); setDia(data); };
+  const abrirDia = (data: string) => { setFuncionarioPendenteId(null); setTipoAoMarcar(""); setBuscaFuncionariosDia(""); setAvisos([]); setDia(data); };
 
   const doDia = dia ? folgas.filter((f) => f.data === dia) : [];
-  const disponiveis = funcionarios.filter((f) => !doDia.some((x) => x.funcionario_id === f.id));
-  const gruposDisponiveis = useMemo(() => {
-    const grupos = new Map<string, { id: string; nome: string; funcionarios: typeof funcionarios }>();
-    disponiveis.forEach((f) => {
-      const id = f.cargo_id ?? "__sem_cargo__";
-      const grupo = grupos.get(id) ?? { id, nome: f.cargos?.nome ?? "Sem cargo", funcionarios: [] as typeof funcionarios };
-      grupo.funcionarios.push(f);
-      grupos.set(id, grupo);
-    });
-    return Array.from(grupos.values())
-      .map((grupo) => ({ ...grupo, funcionarios: grupo.funcionarios.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")) }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [disponiveis]);
-  const termoBuscaFuncionario = buscaFuncionario.trim().toLocaleLowerCase("pt-BR");
-  const gruposVisiveis = useMemo(() => gruposDisponiveis
-    .map((grupo) => ({
-      ...grupo,
-      funcionarios: grupo.funcionarios.filter((f) => f.nome.toLocaleLowerCase("pt-BR").includes(termoBuscaFuncionario)),
-    }))
-    .filter((grupo) => grupo.funcionarios.length > 0), [gruposDisponiveis, termoBuscaFuncionario]);
+  const gruposFuncionarios = useMemo(() => agruparFuncionarios(funcionarios), [funcionarios]);
+  const folgaPorFuncionario = useMemo(() => {
+    const porFuncionario = new Map<string, (typeof doDia)[number]>();
+    doDia.forEach((folga) => porFuncionario.set(folga.funcionario_id, folga));
+    return porFuncionario;
+  }, [doDia]);
+  const termoBuscaFolgas = buscaFuncionariosDia.trim().toLocaleLowerCase("pt-BR");
+  const gruposDoDia = useMemo(() => gruposFuncionarios.map((grupo) => ({
+    ...grupo,
+    totalCargo: grupo.funcionarios.length,
+    deFolga: grupo.funcionarios.filter((f) => folgaPorFuncionario.has(f.id) && f.nome.toLocaleLowerCase("pt-BR").includes(termoBuscaFolgas)),
+    trabalhando: grupo.funcionarios.filter((f) => !folgaPorFuncionario.has(f.id) && f.nome.toLocaleLowerCase("pt-BR").includes(termoBuscaFolgas)),
+  })).filter((grupo) => grupo.deFolga.length > 0 || grupo.trabalhando.length > 0), [gruposFuncionarios, folgaPorFuncionario, termoBuscaFolgas]);
+  const totalDeFolga = funcionarios.reduce((total, f) => total + (folgaPorFuncionario.has(f.id) ? 1 : 0), 0);
+  const totalTrabalhando = funcionarios.length - totalDeFolga;
 
   const atualizar = () => qc.invalidateQueries({ queryKey: ["folgas"] });
   const adicionar = useMutation({
-    mutationFn: () => criarFolga(escolhido, dia!, tipoEscolhido || null),
-    onSuccess: () => { toast.success("Folga marcada."); setEscolhido(""); setTipoEscolhido(""); setAvisos([]); atualizar(); },
-    onError: (e: Error) => toast.error(e.message),
+    mutationFn: ({ funcionarioId, tipoId }: { funcionarioId: string; tipoId: string | null }) => criarFolga(funcionarioId, dia!, tipoId),
+    onSuccess: () => { toast.success("Folga marcada."); setFuncionarioPendenteId(null); setAvisos([]); atualizar(); },
+    onError: (e: Error) => { toast.error(e.message); setFuncionarioPendenteId(null); setAvisos([]); },
   });
   const remover = useMutation({
     mutationFn: excluirFolga,
@@ -105,11 +96,12 @@ function CalendarioPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const tentarAdicionar = () => {
-    const f = porId.get(escolhido);
+  const tentarAdicionar = (funcionarioId: string) => {
+    const f = porId.get(funcionarioId);
     if (!f || !dia) { toast.error("Escolha um funcionário."); return; }
+    setFuncionarioPendenteId(funcionarioId);
     const v = verificarFolga({ funcionario: f, data: dia, folgas, funcionarios, config });
-    if (v.length) setAvisos(v); else adicionar.mutate();
+    if (v.length) setAvisos(v); else adicionar.mutate({ funcionarioId, tipoId: tipoAoMarcar || null });
   };
 
   return (
@@ -157,107 +149,38 @@ function CalendarioPage() {
 
       <LegendaCargos cargos={cargos} tipos={tiposFolga} />
 
-      <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setEscolhido(""); setTipoEscolhido(""); setSeletorFuncionarioAberto(false); setBuscaFuncionario(""); } }}>
-        <DialogContent className="flex w-[calc(100%-2rem)] max-w-2xl min-w-0 max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-4 sm:p-6">
-          <DialogHeader className="min-w-0 shrink-0 pr-8">
+      <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setFuncionarioPendenteId(null); setTipoAoMarcar(""); setBuscaFuncionariosDia(""); setAvisos([]); } }}>
+        <DialogContent className="flex w-[calc(100%-2rem)] max-w-4xl min-w-0 max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-4 sm:p-6">
+          <DialogHeader className="min-w-0 shrink-0 gap-3 pr-8">
             <DialogTitle className="min-w-0 break-words">Folgas de {dia && new Date(`${dia}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</DialogTitle>
-          </DialogHeader>
-          <div className="min-h-0 min-w-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1 max-h-[55vh]">
-            {doDia.length === 0 ? <p className="min-w-0 text-sm text-muted-foreground">Ninguém de folga neste dia.</p> : doDia.map((f) => {
-              const fn = porId.get(f.funcionario_id);
-              return (
-                <div key={f.id} className="grid min-w-0 grid-cols-1 gap-2 rounded-lg border px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere] font-semibold text-foreground">{fn?.nome}</span>
-                    {fn?.cargos && (
-                      <span className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: fn.cargos.cor, color: textoSobreCor(fn.cargos.cor) }}>
-                        {fn.cargos.nome}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex min-w-0 shrink-0 items-center justify-end gap-2">
-                    <span className="relative inline-flex w-14 min-w-0 shrink-0 cursor-pointer rounded-md transition-colors hover:bg-muted/50 focus-within:ring-2 focus-within:ring-ring">
-                      <span aria-hidden="true" className={`flex w-full min-w-0 justify-center overflow-hidden rounded-md border border-dashed px-2.5 py-1.5 text-xs font-semibold leading-none ${f.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
-                        {f.tipo?.sigla ?? "+ tipo"}
-                      </span>
-                      <select
-                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                        value={f.tipo_id ?? ""}
-                        aria-label={`Trocar tipo da folga de ${fn?.nome ?? "funcionário"}`}
-                        title={f.tipo ? `Tipo atual: ${f.tipo.nome}` : "Adicionar tipo à folga"}
-                        onChange={(e) => alterarTipo.mutate({ id: f.id, tipo_id: e.target.value || null })}
-                      >
-                        <option value="">Folga comum</option>
-                        {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
-                      </select>
-                    </span>
-                    <Button variant="ghost" size="icon" className="min-w-0 shrink-0" aria-label="Remover folga" onClick={() => remover.mutate(f.id)}><Trash2 className="text-destructive" /></Button>
+            <div className="grid min-w-0 gap-3 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
+              <p className="min-w-0 text-sm text-muted-foreground">{totalDeFolga} de folga · {totalTrabalhando} trabalhando</p>
+              <div className="grid min-w-0 gap-2 sm:grid-cols-2">
+                <div className="min-w-0 space-y-1">
+                  <Label htmlFor="busca-funcionarios-dia">Buscar funcionário</Label>
+                  <div className="relative min-w-0">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input id="busca-funcionarios-dia" aria-label="Buscar funcionário" value={buscaFuncionariosDia} onChange={(e) => setBuscaFuncionariosDia(e.target.value)} placeholder="Nome do funcionário" className="h-9 pl-9" />
                   </div>
                 </div>
-              );
-            })}
+                <div className="min-w-0 space-y-1">
+                  <Label htmlFor="tipo-ao-marcar">Tipo ao marcar</Label>
+                  <select id="tipo-ao-marcar" aria-label="Tipo ao marcar" className="h-9 w-full min-w-0 cursor-pointer rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring" value={tipoAoMarcar} onChange={(e) => setTipoAoMarcar(e.target.value)}>
+                    <option value="">Folga comum</option>
+                    {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="grid min-h-0 min-w-0 flex-1 grid-rows-2 gap-3 md:grid-cols-2 md:grid-rows-1">
+            <SecaoFolgasDia titulo="De folga" tipo="deFolga" grupos={gruposDoDia} contagem={gruposDoDia.reduce((n, grupo) => n + grupo.deFolga.length, 0)} folgaPorFuncionario={folgaPorFuncionario} tiposFolga={tiposFolga} marcando={adicionar.isPending} removendo={remover.isPending} atualizandoTipo={alterarTipo.isPending} onMarcar={tentarAdicionar} onRemover={(id) => remover.mutate(id)} onMudarTipo={(id, tipo_id) => alterarTipo.mutate({ id, tipo_id })} />
+            <SecaoFolgasDia titulo="Trabalhando" tipo="trabalhando" grupos={gruposDoDia} contagem={gruposDoDia.reduce((n, grupo) => n + grupo.trabalhando.length, 0)} folgaPorFuncionario={folgaPorFuncionario} tiposFolga={tiposFolga} marcando={adicionar.isPending} removendo={remover.isPending} atualizandoTipo={alterarTipo.isPending} onMarcar={tentarAdicionar} onRemover={(id) => remover.mutate(id)} onMudarTipo={(id, tipo_id) => alterarTipo.mutate({ id, tipo_id })} />
           </div>
-          {funcionarios.length === 0 ? <p className="min-w-0 text-sm text-muted-foreground">Cadastre funcionários para marcar folgas.</p> : (
-            <DialogFooter className="w-full min-w-0 flex-col gap-2 sm:flex-row sm:justify-start sm:space-x-0">
-              <Popover open={seletorFuncionarioAberto} onOpenChange={(aberto) => { setSeletorFuncionarioAberto(aberto); if (!aberto) setBuscaFuncionario(""); }}>
-                <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full min-w-0 justify-between font-normal sm:flex-1">
-                    <span className="min-w-0 truncate">{porId.get(escolhido)?.nome ?? "Escolha um funcionário"}</span>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-[min(28rem,calc(100vw-2rem))] min-w-0 p-0">
-                  <div className="relative border-b p-2">
-                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input autoFocus aria-label="Buscar funcionário" value={buscaFuncionario} onChange={(e) => setBuscaFuncionario(e.target.value)} placeholder="Buscar funcionário..." className="h-9 pl-8" />
-                  </div>
-                  {gruposVisiveis.length === 0 ? (
-                    <p className="px-3 py-4 text-center text-sm text-muted-foreground">
-                      {disponiveis.length === 0 ? "Todos os funcionários já estão de folga neste dia." : "Nenhum funcionário encontrado."}
-                    </p>
-                  ) : (
-                    <Accordion type="multiple" value={termoBuscaFuncionario ? gruposVisiveis.map((grupo) => grupo.id) : cargosAbertos} onValueChange={setCargosAbertos} className="max-h-[min(60vh,28rem)] overflow-y-auto px-2">
-                      {gruposVisiveis.map((grupo) => (
-                        <AccordionItem key={grupo.id} value={grupo.id} className="border-b border-border/60">
-                          <AccordionTrigger className="py-3 hover:no-underline">
-                            <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
-                              <span className="min-w-0 truncate text-left">{grupo.nome}</span>
-                              <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{grupo.funcionarios.length}</span>
-                            </span>
-                          </AccordionTrigger>
-                          <AccordionContent className="pb-2">
-                            <div className="space-y-1">
-                              {grupo.funcionarios.map((f) => (
-                                <Button key={f.id} type="button" variant={escolhido === f.id ? "secondary" : "ghost"} className="w-full min-w-0 justify-between text-left" onClick={() => { setEscolhido(f.id); setSeletorFuncionarioAberto(false); setBuscaFuncionario(""); }}>
-                                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">{f.nome}</span>
-                                  {escolhido === f.id && <Check className="shrink-0" aria-hidden="true" />}
-                                </Button>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  )}
-                </PopoverContent>
-              </Popover>
-              <select
-                id="tipo-folga"
-                aria-label="Tipo de folga"
-                className="h-9 w-full min-w-0 cursor-pointer rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:flex-1"
-                value={tipoEscolhido}
-                onChange={(e) => setTipoEscolhido(e.target.value)}
-              >
-                <option value="">Folga comum</option>
-                {tiposFolga.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.sigla} — {tipo.nome}</option>)}
-              </select>
-              <Button className="w-full min-w-0 sm:w-auto sm:shrink-0" onClick={tentarAdicionar} disabled={!escolhido || adicionar.isPending}>Marcar folga</Button>
-            </DialogFooter>
-          )}
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={avisos.length > 0} onOpenChange={(o) => !o && setAvisos([])}>
+      <AlertDialog open={avisos.length > 0} onOpenChange={(o) => { if (!o) { setAvisos([]); setFuncionarioPendenteId(null); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2"><AlertTriangle className="text-destructive" /> Atenção: regra da escala</AlertDialogTitle>
@@ -266,8 +189,11 @@ function CalendarioPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => adicionar.mutate()}>Continuar mesmo assim</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setFuncionarioPendenteId(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              if (funcionarioPendenteId) adicionar.mutate({ funcionarioId: funcionarioPendenteId, tipoId: tipoAoMarcar || null });
+              setFuncionarioPendenteId(null);
+            }}>Continuar mesmo assim</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -275,32 +201,104 @@ function CalendarioPage() {
   );
 }
 
+type Fn = Awaited<ReturnType<typeof listarFuncionarios>>[number];
 type GrupoTabela = { id: string; nome: string; cor?: string; funcionarios: Fn[] };
+type GrupoDia = GrupoTabela & { totalCargo: number; deFolga: Fn[]; trabalhando: Fn[] };
+
+function agruparFuncionarios(funcionarios: Fn[]): GrupoTabela[] {
+  const porCargo = new Map<string, GrupoTabela>();
+  funcionarios.forEach((funcionario) => {
+    const id = funcionario.cargo_id ?? "__sem_cargo__";
+    const grupo = porCargo.get(id) ?? {
+      id,
+      nome: funcionario.cargos?.nome ?? "Sem cargo",
+      cor: funcionario.cargos?.cor ?? undefined,
+      funcionarios: [],
+    };
+    grupo.funcionarios.push(funcionario);
+    porCargo.set(id, grupo);
+  });
+  return Array.from(porCargo.values())
+    .map((grupo) => ({ ...grupo, funcionarios: grupo.funcionarios.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")) }))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}
+
+function SecaoFolgasDia({ titulo, tipo, grupos, contagem, folgaPorFuncionario, tiposFolga, marcando, removendo, atualizandoTipo, onMarcar, onRemover, onMudarTipo }: {
+  titulo: string;
+  tipo: "deFolga" | "trabalhando";
+  grupos: GrupoDia[];
+  contagem: number;
+  folgaPorFuncionario: Map<string, (Awaited<ReturnType<typeof listarFolgas>>)[number]>;
+  tiposFolga: Awaited<ReturnType<typeof listarTiposFolga>>;
+  marcando: boolean;
+  removendo: boolean;
+  atualizandoTipo: boolean;
+  onMarcar: (funcionarioId: string) => void;
+  onRemover: (folgaId: string) => void;
+  onMudarTipo: (folgaId: string, tipoId: string | null) => void;
+}) {
+  const gruposVisiveis = grupos.filter((grupo) => grupo[tipo].length > 0);
+  return (
+    <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border bg-card">
+      <div className="flex min-w-0 shrink-0 items-center justify-between gap-2 border-b px-3 py-2.5">
+        <h3 className="min-w-0 font-semibold">{titulo}</h3>
+        <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">{contagem}</span>
+      </div>
+      <div className="min-h-0 min-w-0 max-h-[60vh] flex-1 overflow-y-auto overscroll-contain p-2 pr-1">
+        {gruposVisiveis.length === 0 ? <p className="px-2 py-8 text-center text-sm text-muted-foreground">Nenhum funcionário nesta seção.</p> : gruposVisiveis.map((grupo) => {
+          const pessoas = grupo[tipo];
+          return (
+            <div key={grupo.id} className="min-w-0">
+              <div className="flex min-w-0 items-center justify-between gap-2 px-2 py-1.5">
+                {grupo.cor ? (
+                  <span className="min-w-0 max-w-full break-words rounded-md px-2 py-1 text-xs font-semibold [overflow-wrap:anywhere]" style={{ backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) }}>{grupo.nome}</span>
+                ) : <span className="min-w-0 break-words text-sm font-semibold [overflow-wrap:anywhere]">{grupo.nome}</span>}
+                <span className="shrink-0 text-xs text-muted-foreground">{pessoas.length} de {grupo.totalCargo}</span>
+              </div>
+              <div className="divide-y divide-border/60">
+                {pessoas.map((funcionario) => {
+                  const folga = folgaPorFuncionario.get(funcionario.id);
+                  return (
+                    <div key={funcionario.id} className="flex min-w-0 items-center justify-between gap-2 px-2 py-1.5">
+                      <span className="min-w-0 flex-1 break-words text-sm text-foreground [overflow-wrap:anywhere]">{funcionario.nome}</span>
+                      {tipo === "trabalhando" ? (
+                        <Button type="button" size="sm" variant="outline" className="h-8 shrink-0 px-2 sm:px-3" aria-label={`Marcar folga de ${funcionario.nome}`} disabled={marcando} onClick={() => onMarcar(funcionario.id)}>
+                          <Plus className="size-4" /><span className="hidden sm:inline">Marcar folga</span>
+                        </Button>
+                      ) : folga && (
+                        <div className="flex min-w-0 shrink-0 items-center gap-1">
+                          <span className="relative inline-flex w-14 min-w-0 shrink-0 cursor-pointer rounded-md transition-colors hover:bg-muted/50 focus-within:ring-2 focus-within:ring-ring">
+                            <span aria-hidden="true" className={`flex w-full min-w-0 justify-center overflow-hidden rounded-md border border-dashed px-2.5 py-1.5 text-xs font-semibold leading-none ${folga.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
+                              {folga.tipo?.sigla ?? "+ tipo"}
+                            </span>
+                            <select className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed" value={folga.tipo_id ?? ""} aria-label={`Trocar tipo da folga de ${funcionario.nome}`} title={folga.tipo ? `Tipo atual: ${folga.tipo.nome}` : "Adicionar tipo à folga"} disabled={atualizandoTipo} onChange={(e) => onMudarTipo(folga.id, e.target.value || null)}>
+                              <option value="">Folga comum</option>
+                              {tiposFolga.map((tipoFolga) => <option key={tipoFolga.id} value={tipoFolga.id}>{tipoFolga.sigla} — {tipoFolga.nome}</option>)}
+                            </select>
+                          </span>
+                          <Button type="button" variant="ghost" size="icon" className="min-w-0 shrink-0" aria-label={`Remover folga de ${funcionario.nome}`} disabled={removendo} onClick={() => onRemover(folga.id)}><Trash2 className="text-destructive" /></Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
   mes: { a: number; m: number };
   funcionarios: Fn[];
   folgas: Awaited<ReturnType<typeof listarFolgas>>;
   hoje: string;
-  onCellClick: (data: string, funcionarioId?: string) => void;
+  onCellClick: (data: string) => void;
 }) {
-  const grupos = useMemo(() => {
-    const porCargo = new Map<string, GrupoTabela>();
-    funcionarios.forEach((funcionario) => {
-      const id = funcionario.cargo_id ?? "__sem_cargo__";
-      const grupo = porCargo.get(id) ?? {
-        id,
-        nome: funcionario.cargos?.nome ?? "Sem cargo",
-        cor: funcionario.cargos?.cor ?? undefined,
-        funcionarios: [],
-      };
-      grupo.funcionarios.push(funcionario);
-      porCargo.set(id, grupo);
-    });
-    return Array.from(porCargo.values())
-      .map((grupo) => ({ ...grupo, funcionarios: grupo.funcionarios.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")) }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [funcionarios]);
+  const grupos = useMemo(() => agruparFuncionarios(funcionarios), [funcionarios]);
   const dias = Array.from({ length: new Date(mes.a, mes.m + 1, 0).getDate() }, (_, i) => i + 1);
   const folgasPorCelula = useMemo(() => {
     const porCelula = new Map<string, (typeof folgas)[number]>();
@@ -364,7 +362,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
                     const nomeData = new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
                     return (
                       <td key={data} className="w-12 min-w-12 border-b border-r p-1 text-center">
-                        <button type="button" className={`h-8 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? (grupo.cor ? "font-semibold" : "bg-muted font-semibold") : "hover:bg-accent"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data, folga ? undefined : funcionario.id)}>
+                        <button type="button" className={`h-8 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? (grupo.cor ? "font-semibold" : "bg-muted font-semibold") : "hover:bg-accent"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
                           {folga ? folga.tipo?.sigla ?? "F" : null}
                         </button>
                       </td>
@@ -436,7 +434,6 @@ function LegendaCargos({ cargos, tipos }: { cargos: Cargo[]; tipos: Awaited<Retu
   );
 }
 
-type Fn = Awaited<ReturnType<typeof listarFuncionarios>>[number];
 function DiaCelula({ dataIso, numero, hoje, folgas, porId, onClick, lista }: {
   dataIso: string; numero: number; hoje: string; folgas: Awaited<ReturnType<typeof listarFolgas>>;
   porId: Map<string, Fn>; onClick: (d: string) => void; lista?: boolean;
