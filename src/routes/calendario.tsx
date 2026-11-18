@@ -105,7 +105,7 @@ function CalendarioPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className={`mx-auto w-full ${visao === "tabela" ? "max-w-none" : "max-w-6xl"}`}>
       <PageHeader title="Calendário" subtitle="Consulte a escala do mês e marque ou remova folgas."
         action={<div role="group" aria-label="Visão da escala" className="flex items-center gap-1 rounded-lg border bg-card p-1">
           <Button type="button" size="sm" variant={visao === "calendario" ? "secondary" : "ghost"} aria-pressed={visao === "calendario"} onClick={() => setVisao("calendario")}>Calendário</Button>
@@ -320,7 +320,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
   }
 
   return (
-    <div className="max-h-[70vh] overflow-auto rounded-xl border bg-card shadow-sm">
+    <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
       <table className="w-max min-w-full border-separate border-spacing-0 text-sm">
         <caption className="sr-only">Escala mensal de folgas por funcionário e cargo</caption>
         <thead>
@@ -328,9 +328,12 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
             <th scope="col" className="sticky left-0 top-0 z-40 min-w-56 border-b border-r bg-muted px-3 py-2 text-left font-semibold">Funcionário / cargo</th>
             {dias.map((numero) => {
               const data = iso(mes.a, mes.m, numero);
-              const semana = SEMANA[new Date(`${data}T12:00`).getDay()];
+              const diaSemana = new Date(`${data}T12:00`).getDay();
+              const semana = SEMANA[diaSemana];
+              const domingo = diaSemana === 0;
+              const inicioSemana = domingo && numero !== 1;
               return (
-                <th key={data} scope="col" className={`sticky top-0 z-30 w-12 min-w-12 border-b border-r px-1 py-1 text-center ${data === hoje ? "bg-primary/10" : "bg-muted"}`}>
+                <th key={data} scope="col" className={`sticky top-0 z-30 w-12 min-w-12 border-b border-r px-1 py-1 text-center ${data === hoje ? "bg-primary/10" : domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
                   <button type="button" className="flex w-full flex-col items-center rounded px-1 py-1 hover:bg-accent" aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
                     <span className="font-semibold">{numero}</span>
                     <span className="text-[10px] font-normal uppercase text-muted-foreground">{semana}</span>
@@ -358,10 +361,12 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
                   </th>
                   {dias.map((numero) => {
                     const data = iso(mes.a, mes.m, numero);
+                    const domingo = new Date(`${data}T12:00`).getDay() === 0;
+                    const inicioSemana = domingo && numero !== 1;
                     const folga = folgasPorCelula.get(`${funcionario.id}:${data}`);
                     const nomeData = new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
                     return (
-                      <td key={data} className="w-12 min-w-12 border-b border-r p-1 text-center">
+                      <td key={data} className={`w-12 min-w-12 border-b border-r p-1 text-center ${domingo ? "bg-muted/40" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
                         <button type="button" className={`h-8 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? (grupo.cor ? "font-semibold" : "bg-muted font-semibold") : "hover:bg-accent"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
                           {folga ? folga.tipo?.sigla ?? "F" : null}
                         </button>
@@ -384,9 +389,11 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
               </th>
               {dias.map((numero) => {
                 const data = iso(mes.a, mes.m, numero);
+                const domingo = new Date(`${data}T12:00`).getDay() === 0;
+                const inicioSemana = domingo && numero !== 1;
                 const ausentes = ausentesPorDia.get(data);
                 const cobertura = grupo.funcionarios.reduce((total, funcionario) => total + (ausentes?.has(funcionario.id) ? 0 : 1), 0);
-                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className="w-12 min-w-12 border-b border-r border-t bg-muted px-1 py-2 text-center">{cobertura}</td>;
+                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className={`w-12 min-w-12 border-b border-r border-t px-1 py-2 text-center ${domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>{cobertura}</td>;
               })}
             </tr>
           ))}
