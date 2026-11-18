@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Check, ChevronDown, ChevronLeft, ChevronRight, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -44,6 +44,7 @@ function CalendarioPage() {
   const { data: tiposFolga = [] } = useQuery({ queryKey: ["tipos-folga"], queryFn: listarTiposFolga });
   const hoje = new Date();
   const [mes, setMes] = useState({ a: hoje.getFullYear(), m: hoje.getMonth() });
+  const [visao, setVisao] = useState<"calendario" | "tabela">("calendario");
   const [config, setConfig] = useState<ConfigEscala>(CONFIG_PADRAO);
   const [dia, setDia] = useState<string | null>(null);
   const [escolhido, setEscolhido] = useState("");
@@ -63,6 +64,7 @@ function CalendarioPage() {
   const celulas = [...Array(inicio).fill(null), ...Array.from({ length: total }, (_, i) => i + 1)];
   const titulo = new Date(mes.a, mes.m, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
   const andar = (n: number) => { const d = new Date(mes.a, mes.m + n, 1); setMes({ a: d.getFullYear(), m: d.getMonth() }); };
+  const abrirDia = (data: string, funcionarioId?: string) => { setEscolhido(funcionarioId ?? ""); setTipoEscolhido(""); setDia(data); };
 
   const doDia = dia ? folgas.filter((f) => f.data === dia) : [];
   const disponiveis = funcionarios.filter((f) => !doDia.some((x) => x.funcionario_id === f.id));
@@ -112,7 +114,11 @@ function CalendarioPage() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHeader title="Calendário" subtitle="Clique em um dia para marcar ou remover folgas." />
+      <PageHeader title="Calendário" subtitle="Consulte a escala do mês e marque ou remova folgas."
+        action={<div role="group" aria-label="Visão da escala" className="flex items-center gap-1 rounded-lg border bg-card p-1">
+          <Button type="button" size="sm" variant={visao === "calendario" ? "secondary" : "ghost"} aria-pressed={visao === "calendario"} onClick={() => setVisao("calendario")}>Calendário</Button>
+          <Button type="button" size="sm" variant={visao === "tabela" ? "secondary" : "ghost"} aria-pressed={visao === "tabela"} onClick={() => setVisao("tabela")}>Tabela</Button>
+        </div>} />
 
       <div className="mb-4 flex flex-wrap items-end justify-between gap-4 rounded-xl border bg-card p-4 shadow-sm">
         <div className="flex items-center gap-2">
@@ -131,17 +137,23 @@ function CalendarioPage() {
         </div>
       </div>
 
-      <div className="hidden grid-cols-7 gap-px overflow-hidden rounded-xl border bg-border shadow-sm md:grid">
-        {SEMANA.map((s) => <div key={s} className="bg-muted px-2 py-2 text-center text-xs font-bold uppercase text-muted-foreground">{s}</div>)}
-        {celulas.map((d, i) => d === null ? <div key={`v${i}`} className="bg-card/50" /> : (
-          <DiaCelula key={d} dataIso={iso(mes.a, mes.m, d)} numero={d} hoje={hojeIso} folgas={folgas} porId={porId} onClick={setDia} />
-        ))}
-      </div>
-      <div className="space-y-2 md:hidden">
-        {Array.from({ length: total }, (_, i) => i + 1).map((d) => (
-          <DiaCelula key={d} dataIso={iso(mes.a, mes.m, d)} numero={d} hoje={hojeIso} folgas={folgas} porId={porId} onClick={setDia} lista />
-        ))}
-      </div>
+      {visao === "calendario" ? (
+        <>
+          <div className="hidden grid-cols-7 gap-px overflow-hidden rounded-xl border bg-border shadow-sm md:grid">
+            {SEMANA.map((s) => <div key={s} className="bg-muted px-2 py-2 text-center text-xs font-bold uppercase text-muted-foreground">{s}</div>)}
+            {celulas.map((d, i) => d === null ? <div key={`v${i}`} className="bg-card/50" /> : (
+              <DiaCelula key={d} dataIso={iso(mes.a, mes.m, d)} numero={d} hoje={hojeIso} folgas={folgas} porId={porId} onClick={abrirDia} />
+            ))}
+          </div>
+          <div className="space-y-2 md:hidden">
+            {Array.from({ length: total }, (_, i) => i + 1).map((d) => (
+              <DiaCelula key={d} dataIso={iso(mes.a, mes.m, d)} numero={d} hoje={hojeIso} folgas={folgas} porId={porId} onClick={abrirDia} lista />
+            ))}
+          </div>
+        </>
+      ) : (
+        <TabelaEscala mes={mes} funcionarios={funcionarios} folgas={folgas} hoje={hojeIso} onCellClick={abrirDia} />
+      )}
 
       <LegendaCargos cargos={cargos} tipos={tiposFolga} />
 
@@ -259,6 +271,129 @@ function CalendarioPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+type GrupoTabela = { id: string; nome: string; cor?: string; funcionarios: Fn[] };
+
+function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
+  mes: { a: number; m: number };
+  funcionarios: Fn[];
+  folgas: Awaited<ReturnType<typeof listarFolgas>>;
+  hoje: string;
+  onCellClick: (data: string, funcionarioId?: string) => void;
+}) {
+  const grupos = useMemo(() => {
+    const porCargo = new Map<string, GrupoTabela>();
+    funcionarios.forEach((funcionario) => {
+      const id = funcionario.cargo_id ?? "__sem_cargo__";
+      const grupo = porCargo.get(id) ?? {
+        id,
+        nome: funcionario.cargos?.nome ?? "Sem cargo",
+        cor: funcionario.cargos?.cor ?? undefined,
+        funcionarios: [],
+      };
+      grupo.funcionarios.push(funcionario);
+      porCargo.set(id, grupo);
+    });
+    return Array.from(porCargo.values())
+      .map((grupo) => ({ ...grupo, funcionarios: grupo.funcionarios.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")) }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  }, [funcionarios]);
+  const dias = Array.from({ length: new Date(mes.a, mes.m + 1, 0).getDate() }, (_, i) => i + 1);
+  const folgasPorCelula = useMemo(() => {
+    const porCelula = new Map<string, (typeof folgas)[number]>();
+    folgas.forEach((folga) => porCelula.set(`${folga.funcionario_id}:${folga.data}`, folga));
+    return porCelula;
+  }, [folgas]);
+  const ausentesPorDia = useMemo(() => {
+    const porDia = new Map<string, Set<string>>();
+    folgas.forEach((folga) => {
+      const ausentes = porDia.get(folga.data) ?? new Set<string>();
+      ausentes.add(folga.funcionario_id);
+      porDia.set(folga.data, ausentes);
+    });
+    return porDia;
+  }, [folgas]);
+
+  if (funcionarios.length === 0) {
+    return <div className="rounded-xl border bg-card px-4 py-10 text-center text-sm text-muted-foreground">Cadastre funcionários para montar a escala.</div>;
+  }
+
+  return (
+    <div className="max-h-[70vh] overflow-auto rounded-xl border bg-card shadow-sm">
+      <table className="w-max min-w-full border-separate border-spacing-0 text-sm">
+        <caption className="sr-only">Escala mensal de folgas por funcionário e cargo</caption>
+        <thead>
+          <tr>
+            <th scope="col" className="sticky left-0 top-0 z-40 min-w-56 border-b border-r bg-muted px-3 py-2 text-left font-semibold">Funcionário / cargo</th>
+            {dias.map((numero) => {
+              const data = iso(mes.a, mes.m, numero);
+              const semana = SEMANA[new Date(`${data}T12:00`).getDay()];
+              return (
+                <th key={data} scope="col" className={`sticky top-0 z-30 w-12 min-w-12 border-b border-r px-1 py-1 text-center ${data === hoje ? "bg-primary/10" : "bg-muted"}`}>
+                  <button type="button" className="flex w-full flex-col items-center rounded px-1 py-1 hover:bg-accent" aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
+                    <span className="font-semibold">{numero}</span>
+                    <span className="text-[10px] font-normal uppercase text-muted-foreground">{semana}</span>
+                  </button>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {grupos.map((grupo) => (
+            <Fragment key={grupo.id}>
+              <tr>
+                <th scope="rowgroup" colSpan={dias.length + 1} className="border-b border-t bg-muted/60 px-3 py-2 text-left">
+                  {grupo.cor ? (
+                    <span className="rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) }}>{grupo.nome}</span>
+                  ) : <span className="font-semibold">{grupo.nome}</span>}
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">{grupo.funcionarios.length} {grupo.funcionarios.length === 1 ? "funcionário" : "funcionários"}</span>
+                </th>
+              </tr>
+              {grupo.funcionarios.map((funcionario) => (
+                <tr key={funcionario.id} className="hover:bg-muted/20">
+                  <th scope="row" className="sticky left-0 z-20 min-w-56 border-b border-r bg-card px-3 py-1.5 text-left font-medium">
+                    <span className="block min-w-0 [overflow-wrap:anywhere]">{funcionario.nome}</span>
+                  </th>
+                  {dias.map((numero) => {
+                    const data = iso(mes.a, mes.m, numero);
+                    const folga = folgasPorCelula.get(`${funcionario.id}:${data}`);
+                    const nomeData = new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+                    return (
+                      <td key={data} className="w-12 min-w-12 border-b border-r p-1 text-center">
+                        <button type="button" className={`h-8 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? (grupo.cor ? "font-semibold" : "bg-muted font-semibold") : "hover:bg-accent"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data, folga ? undefined : funcionario.id)}>
+                          {folga ? folga.tipo?.sigla ?? "F" : null}
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </Fragment>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colSpan={dias.length + 1} className="border-t bg-muted px-3 py-2 text-left text-xs font-bold uppercase text-muted-foreground">Cobertura por cargo — pessoas trabalhando</th>
+          </tr>
+          {grupos.map((grupo) => (
+            <tr key={grupo.id} className="bg-muted/60 font-semibold">
+              <th scope="row" className="sticky left-0 z-20 min-w-56 border-b border-r border-t bg-muted px-3 py-2 text-left">
+                <span className="block min-w-0 truncate">{grupo.nome}</span>
+              </th>
+              {dias.map((numero) => {
+                const data = iso(mes.a, mes.m, numero);
+                const ausentes = ausentesPorDia.get(data);
+                const cobertura = grupo.funcionarios.reduce((total, funcionario) => total + (ausentes?.has(funcionario.id) ? 0 : 1), 0);
+                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className="w-12 min-w-12 border-b border-r border-t bg-muted px-1 py-2 text-center">{cobertura}</td>;
+              })}
+            </tr>
+          ))}
+        </tfoot>
+      </table>
     </div>
   );
 }
