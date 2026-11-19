@@ -11,7 +11,6 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PageHeader } from "@/components/PageHeader";
 import { listarCargos, type Cargo } from "@/services/cargos";
 import { listarFuncionarios } from "@/services/funcionarios";
 import { listarFolgas, criarFolga, excluirFolga, atualizarTipoFolga } from "@/services/folgas";
@@ -43,6 +42,7 @@ function CalendarioPage() {
   const hoje = new Date();
   const [mes, setMes] = useState({ a: hoje.getFullYear(), m: hoje.getMonth() });
   const [visao, setVisao] = useState<"calendario" | "tabela">("calendario");
+  const [mostrarCobertura, setMostrarCobertura] = useState(false);
   const [config, setConfig] = useState<ConfigEscala>(CONFIG_PADRAO);
   const [dia, setDia] = useState<string | null>(null);
   const [funcionarioPendenteId, setFuncionarioPendenteId] = useState<string | null>(null);
@@ -105,27 +105,35 @@ function CalendarioPage() {
   };
 
   return (
-    <div className={`mx-auto w-full ${visao === "tabela" ? "max-w-none" : "max-w-6xl"}`}>
-      <PageHeader title="Calendário" subtitle="Consulte a escala do mês e marque ou remova folgas."
-        action={<div role="group" aria-label="Visão da escala" className="flex items-center gap-1 rounded-lg border bg-card p-1">
-          <Button type="button" size="sm" variant={visao === "calendario" ? "secondary" : "ghost"} aria-pressed={visao === "calendario"} onClick={() => setVisao("calendario")}>Calendário</Button>
-          <Button type="button" size="sm" variant={visao === "tabela" ? "secondary" : "ghost"} aria-pressed={visao === "tabela"} onClick={() => setVisao("tabela")}>Tabela</Button>
-        </div>} />
-
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-4 rounded-xl border bg-card p-4 shadow-sm">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" aria-label="Mês anterior" onClick={() => andar(-1)}><ChevronLeft /></Button>
-          <Button variant="outline" onClick={() => setMes({ a: hoje.getFullYear(), m: hoje.getMonth() })}>Hoje</Button>
-          <Button variant="outline" size="icon" aria-label="Próximo mês" onClick={() => andar(1)}><ChevronRight /></Button>
-          <h2 className="ml-2 text-lg font-bold capitalize">{titulo}</h2>
+    <div className={`mx-auto w-full ${visao === "tabela" ? "calendar-table-view flex min-h-0 flex-1 flex-col max-w-none" : "max-w-6xl"}`}>
+      <h1 className="sr-only">Calendário</h1>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-lg border bg-card px-3 py-2 shadow-sm lg:flex-nowrap">
+        <div className="flex min-w-0 flex-wrap items-center gap-1">
+          <Button variant="outline" size="icon" className="size-8 shrink-0" aria-label="Mês anterior" onClick={() => andar(-1)}><ChevronLeft /></Button>
+          <Button variant="outline" size="sm" className="h-8 shrink-0" onClick={() => setMes({ a: hoje.getFullYear(), m: hoje.getMonth() })}>Hoje</Button>
+          <Button variant="outline" size="icon" className="size-8 shrink-0" aria-label="Próximo mês" onClick={() => andar(1)}><ChevronRight /></Button>
+          <h2 className="ml-1 whitespace-nowrap px-1 text-base font-bold capitalize">{titulo}</h2>
         </div>
-        <div className="flex gap-4">
-          <div className="space-y-1"><Label htmlFor="lim">Máx. por cargo/dia</Label>
-            <Input id="lim" type="number" min={1} className="w-28" value={config.limitePorCargoDia}
-              onChange={(e) => mudarConfig({ ...config, limitePorCargoDia: Math.max(1, Number(e.target.value) || 1) })} /></div>
-          <div className="space-y-1"><Label htmlFor="max">Máx. folgas/mês</Label>
-            <Input id="max" type="number" min={1} className="w-28" value={config.maxFolgasMes}
-              onChange={(e) => mudarConfig({ ...config, maxFolgasMes: Math.max(1, Number(e.target.value) || 1) })} /></div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 lg:flex-nowrap">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="lim" className="whitespace-nowrap text-xs">Máx. por cargo/dia</Label>
+            <Input id="lim" type="number" min={1} className="h-8 w-16 px-2 text-sm" value={config.limitePorCargoDia}
+              onChange={(e) => mudarConfig({ ...config, limitePorCargoDia: Math.max(1, Number(e.target.value) || 1) })} />
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="max" className="whitespace-nowrap text-xs">Máx. folgas/mês</Label>
+            <Input id="max" type="number" min={1} className="h-8 w-16 px-2 text-sm" value={config.maxFolgasMes}
+              onChange={(e) => mudarConfig({ ...config, maxFolgasMes: Math.max(1, Number(e.target.value) || 1) })} />
+          </div>
+          <div role="group" aria-label="Visão da escala" className="flex items-center gap-1 rounded-lg border bg-card p-1">
+            <Button type="button" size="sm" variant={visao === "calendario" ? "secondary" : "ghost"} aria-pressed={visao === "calendario"} onClick={() => setVisao("calendario")}>Calendário</Button>
+            <Button type="button" size="sm" variant={visao === "tabela" ? "secondary" : "ghost"} aria-pressed={visao === "tabela"} onClick={() => setVisao("tabela")}>Tabela</Button>
+          </div>
+          {visao === "tabela" && funcionarios.length > 0 && (
+            <Button type="button" size="sm" variant="outline" aria-expanded={mostrarCobertura} aria-controls="cobertura-escala" onClick={() => setMostrarCobertura((mostrar) => !mostrar)}>
+              {mostrarCobertura ? "Ocultar cobertura" : "Mostrar cobertura"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -144,10 +152,10 @@ function CalendarioPage() {
           </div>
         </>
       ) : (
-        <TabelaEscala mes={mes} funcionarios={funcionarios} folgas={folgas} hoje={hojeIso} onCellClick={abrirDia} />
+        <TabelaEscala mes={mes} funcionarios={funcionarios} folgas={folgas} hoje={hojeIso} mostrarCobertura={mostrarCobertura} onCellClick={abrirDia} />
       )}
 
-      <LegendaCargos cargos={cargos} tipos={tiposFolga} />
+      {visao === "calendario" && <LegendaCargos cargos={cargos} tipos={tiposFolga} />}
 
       <Dialog open={!!dia} onOpenChange={(o) => { if (!o) { setDia(null); setFuncionarioPendenteId(null); setTipoAoMarcar(""); setBuscaFuncionariosDia(""); setAvisos([]); } }}>
         <DialogContent className="flex w-[calc(100%-2rem)] max-w-4xl min-w-0 max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-4 sm:p-6">
@@ -291,11 +299,12 @@ function SecaoFolgasDia({ titulo, tipo, grupos, contagem, folgaPorFuncionario, t
   );
 }
 
-function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
+function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCellClick }: {
   mes: { a: number; m: number };
   funcionarios: Fn[];
   folgas: Awaited<ReturnType<typeof listarFolgas>>;
   hoje: string;
+  mostrarCobertura: boolean;
   onCellClick: (data: string) => void;
 }) {
   const grupos = useMemo(() => agruparFuncionarios(funcionarios), [funcionarios]);
@@ -315,17 +324,16 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
     return porDia;
   }, [folgas]);
 
-  if (funcionarios.length === 0) {
-    return <div className="rounded-xl border bg-card px-4 py-10 text-center text-sm text-muted-foreground">Cadastre funcionários para montar a escala.</div>;
-  }
-
   return (
-    <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
-      <table className="w-max min-w-full border-separate border-spacing-0 text-sm">
+    <div className="min-h-0 min-w-0 flex-1 overflow-auto rounded-xl border bg-card shadow-sm">
+      {funcionarios.length === 0 ? (
+        <div className="px-4 py-10 text-center text-sm text-muted-foreground">Cadastre funcionários para montar a escala.</div>
+      ) : (
+        <table className="w-full border-separate border-spacing-0 text-sm">
         <caption className="sr-only">Escala mensal de folgas por funcionário e cargo</caption>
         <thead>
           <tr>
-            <th scope="col" className="sticky left-0 top-0 z-40 min-w-56 border-b border-r bg-muted px-3 py-2 text-left font-semibold">Funcionário / cargo</th>
+            <th scope="col" className="sticky left-0 top-0 z-40 min-w-44 border-b border-r bg-card px-2 py-0.5 text-left font-semibold">Funcionário / cargo</th>
             {dias.map((numero) => {
               const data = iso(mes.a, mes.m, numero);
               const diaSemana = new Date(`${data}T12:00`).getDay();
@@ -333,9 +341,9 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
               const domingo = diaSemana === 0;
               const inicioSemana = domingo && numero !== 1;
               return (
-                <th key={data} scope="col" className={`sticky top-0 z-30 w-12 min-w-12 border-b border-r px-1 py-1 text-center ${data === hoje ? "bg-primary/10" : domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
-                  <button type="button" className="flex w-full flex-col items-center rounded px-1 py-1 hover:bg-accent" aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
-                    <span className="font-semibold">{numero}</span>
+                <th key={data} scope="col" className={`sticky top-0 z-30 min-w-8 border-b border-r px-1 py-0.5 text-center ${data === hoje ? "bg-primary/10" : domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
+                  <button type="button" className="flex w-full flex-col items-center rounded px-1 py-0 hover:bg-accent" aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
+                    <span className="text-xs font-semibold">{numero}</span>
                     <span className="text-[10px] font-normal uppercase text-muted-foreground">{semana}</span>
                   </button>
                 </th>
@@ -347,16 +355,17 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
           {grupos.map((grupo) => (
             <Fragment key={grupo.id}>
               <tr>
-                <th scope="rowgroup" colSpan={dias.length + 1} className="border-b border-t bg-muted/60 px-3 py-2 text-left">
+                <th scope="rowgroup" className="sticky left-0 z-20 min-w-44 border-b border-r border-t bg-muted px-3 py-1 text-left">
                   {grupo.cor ? (
-                    <span className="rounded-md px-2 py-1 text-xs font-semibold" style={{ backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) }}>{grupo.nome}</span>
+                    <span className="rounded-md px-2 py-0.5 text-xs font-semibold" style={{ backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) }}>{grupo.nome}</span>
                   ) : <span className="font-semibold">{grupo.nome}</span>}
-                  <span className="ml-2 text-xs font-normal text-muted-foreground">{grupo.funcionarios.length} {grupo.funcionarios.length === 1 ? "funcionário" : "funcionários"}</span>
+                  <span className="ml-2 text-[11px] font-normal text-muted-foreground">{grupo.funcionarios.length} {grupo.funcionarios.length === 1 ? "funcionário" : "funcionários"}</span>
                 </th>
+                <td colSpan={dias.length} className="border-b border-r border-t bg-muted/60" />
               </tr>
               {grupo.funcionarios.map((funcionario) => (
                 <tr key={funcionario.id} className="hover:bg-muted/20">
-                  <th scope="row" className="sticky left-0 z-20 min-w-56 border-b border-r bg-card px-3 py-1.5 text-left font-medium">
+                  <th scope="row" className="sticky left-0 z-20 min-w-44 border-b border-r bg-card px-2 py-0.5 text-left text-xs font-medium">
                     <span className="block min-w-0 [overflow-wrap:anywhere]">{funcionario.nome}</span>
                   </th>
                   {dias.map((numero) => {
@@ -366,8 +375,8 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
                     const folga = folgasPorCelula.get(`${funcionario.id}:${data}`);
                     const nomeData = new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
                     return (
-                      <td key={data} className={`w-12 min-w-12 border-b border-r p-1 text-center ${domingo ? "bg-muted/40" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
-                        <button type="button" className={`h-8 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? (grupo.cor ? "font-semibold" : "bg-muted font-semibold") : "hover:bg-accent"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
+                      <td key={data} className={`min-w-8 border-b border-r p-0.5 text-center ${domingo ? "bg-muted/40" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
+                        <button type="button" className={`h-6 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? (grupo.cor ? "font-semibold" : "bg-muted font-semibold") : "hover:bg-accent"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
                           {folga ? folga.tipo?.sigla ?? "F" : null}
                         </button>
                       </td>
@@ -378,13 +387,14 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
             </Fragment>
           ))}
         </tbody>
-        <tfoot>
+        <tfoot id="cobertura-escala" hidden={!mostrarCobertura}>
           <tr>
-            <th colSpan={dias.length + 1} className="border-t bg-muted px-3 py-2 text-left text-xs font-bold uppercase text-muted-foreground">Cobertura por cargo — pessoas trabalhando</th>
+            <th className="sticky left-0 z-20 min-w-44 border-b border-r border-t bg-muted px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground">Cobertura por cargo — pessoas trabalhando</th>
+            <td colSpan={dias.length} className="border-b border-r border-t bg-muted" />
           </tr>
           {grupos.map((grupo) => (
             <tr key={grupo.id} className="bg-muted/60 font-semibold">
-              <th scope="row" className="sticky left-0 z-20 min-w-56 border-b border-r border-t bg-muted px-3 py-2 text-left">
+              <th scope="row" className="sticky left-0 z-20 min-w-44 border-b border-r border-t bg-muted px-2 py-0.5 text-left text-xs">
                 <span className="block min-w-0 truncate">{grupo.nome}</span>
               </th>
               {dias.map((numero) => {
@@ -393,12 +403,13 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }: {
                 const inicioSemana = domingo && numero !== 1;
                 const ausentes = ausentesPorDia.get(data);
                 const cobertura = grupo.funcionarios.reduce((total, funcionario) => total + (ausentes?.has(funcionario.id) ? 0 : 1), 0);
-                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className={`w-12 min-w-12 border-b border-r border-t px-1 py-2 text-center ${domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>{cobertura}</td>;
+                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className={`min-w-8 border-b border-r border-t px-0.5 py-1 text-center text-xs ${domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>{cobertura}</td>;
               })}
             </tr>
           ))}
         </tfoot>
-      </table>
+        </table>
+      )}
     </div>
   );
 }
