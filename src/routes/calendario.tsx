@@ -308,6 +308,8 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
   onCellClick: (data: string) => void;
 }) {
   const grupos = useMemo(() => agruparFuncionarios(funcionarios), [funcionarios]);
+  const [cargosOcultos, setCargosOcultos] = useState<Set<string>>(() => new Set());
+  const gruposVisiveis = useMemo(() => grupos.filter((grupo) => !cargosOcultos.has(grupo.id)), [cargosOcultos, grupos]);
   const dias = Array.from({ length: new Date(mes.a, mes.m + 1, 0).getDate() }, (_, i) => i + 1);
   const folgasPorCelula = useMemo(() => {
     const porCelula = new Map<string, (typeof folgas)[number]>();
@@ -325,10 +327,24 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
   }, [folgas]);
 
   return (
-    <div className="min-h-0 min-w-0 flex-1 overflow-auto rounded-xl border bg-card shadow-sm">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border bg-card shadow-sm">
       {funcionarios.length === 0 ? (
         <div className="px-4 py-10 text-center text-sm text-muted-foreground">Cadastre funcionários para montar a escala.</div>
       ) : (
+        <>
+        <div className="flex min-h-9 flex-wrap gap-1.5 border-b px-3 py-1">
+          <button type="button" aria-pressed={cargosOcultos.size === 0} aria-label="Mostrar todos os cargos" className={`h-7 rounded-full px-3 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${cargosOcultos.size === 0 ? "bg-muted text-foreground" : "border border-border bg-transparent text-muted-foreground"}`} onClick={() => setCargosOcultos(new Set())}>Todos</button>
+          {grupos.map((grupo) => {
+            const visivel = !cargosOcultos.has(grupo.id);
+            return (
+              <button key={grupo.id} type="button" aria-pressed={visivel} aria-label={`Mostrar cargo ${grupo.nome}`} className={`h-7 rounded-full px-3 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${visivel ? "" : "border border-border bg-transparent text-muted-foreground"}`} style={visivel && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} onClick={() => setCargosOcultos((atuais) => { const proximos = new Set(atuais); if (proximos.has(grupo.id)) proximos.delete(grupo.id); else proximos.add(grupo.id); return proximos; })}>
+                {!visivel && <span className="mr-1.5 inline-block size-2 rounded-sm align-middle" style={grupo.cor ? { backgroundColor: grupo.cor } : undefined} />}
+                {grupo.nome}
+              </button>
+            );
+          })}
+        </div>
+        <div className="min-h-0 min-w-0 flex-1 overflow-auto">
         <table className="w-full border-separate border-spacing-0 text-sm">
         <caption className="sr-only">Escala mensal de folgas por funcionário e cargo</caption>
         <thead>
@@ -352,7 +368,13 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
           </tr>
         </thead>
         <tbody>
-          {grupos.map((grupo) => (
+          {gruposVisiveis.length === 0 ? (
+            <tr>
+              <td colSpan={dias.length + 1} className="px-4 py-6 text-center text-sm text-muted-foreground">
+                Nenhum cargo selecionado. <button type="button" className="font-semibold text-foreground underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setCargosOcultos(new Set())}>Todos</button>
+              </td>
+            </tr>
+          ) : gruposVisiveis.map((grupo) => (
             <Fragment key={grupo.id}>
               <tr>
                 <th scope="rowgroup" className="sticky left-0 z-20 h-[22px] w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-3 py-0.5 text-left">
@@ -392,7 +414,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
             <th className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground">Cobertura por cargo — pessoas trabalhando</th>
             <td colSpan={dias.length} className="border-b border-r border-t bg-muted" />
           </tr>
-          {grupos.map((grupo) => (
+          {gruposVisiveis.map((grupo) => (
             <tr key={grupo.id} className="bg-muted/60 font-semibold">
               <th scope="row" className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-2 py-0.5 text-left text-xs">
                 <span className="block min-w-0 truncate">{grupo.nome}</span>
@@ -409,6 +431,8 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
           ))}
         </tfoot>
         </table>
+        </div>
+        </>
       )}
     </div>
   );
