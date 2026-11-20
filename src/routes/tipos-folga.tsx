@@ -60,7 +60,7 @@ function TiposFolgaPage() {
     <div className="mx-auto max-w-4xl">
       <PageHeader title="Tipos de folga" subtitle="Classifique as folgas da equipe com uma sigla curta."
         action={<Button onClick={() => abrir(null)}><Plus /> Novo tipo</Button>} />
-      <div className="rounded-xl border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
         <Table>
           <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Sigla</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
           <TableBody>

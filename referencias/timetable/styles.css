@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ttb01-bg: #0e0f1a;
+  --color-ttb01-bg: oklch(0.17 0.025 280);
+  --color-ttb01-glow: #252554;
+  --color-ttb01-glow: oklch(0.28 0.09 280 / 0.7);
+  --color-ttb01-card: #181a2b;
+  --color-ttb01-card: oklch(0.22 0.03 280);
+  --color-ttb01-line: #2a2c46;
+  --color-ttb01-line: oklch(0.3 0.045 280);
+  --color-ttb01-ink: #e7e7f5;
+  --color-ttb01-ink: oklch(0.93 0.015 285);
+  --color-ttb01-mut: #a4a7c6;
+  --color-ttb01-mut: oklch(0.74 0.04 280);
+  --color-ttb01-acc: #7a6fff;
+  --color-ttb01-acc: oklch(0.62 0.2 282);
+  --color-ttb01-acc-ink: #b9b3ff;
+  --color-ttb01-acc-ink: oklch(0.8 0.1 285);
+  --color-ttb01-acc2: #22d3ee;
+  --color-ttb01-acc2: oklch(0.8 0.13 210);
+  --color-ttb01-ok: #34d399;
+  --color-ttb01-ok: oklch(0.78 0.15 165);
+  --color-ttb01-warn: #fbbf24;
+  --color-ttb01-warn: oklch(0.84 0.16 85);
+  --color-ttb01-bad: #f87171;
+  --color-ttb01-bad: oklch(0.71 0.17 22);
+  --font-ttb01-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --animate-ttb01-pulse: ttb01-pulse 2s ease-in-out infinite;
+
+  @keyframes ttb01-pulse {
+    0%,
+        100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.45;
+      transform: scale(0.7);
+    }
+  }
+}
+/* Root rule: the full-bleed contract, stated in CSS as well as in the markup's utilities, so the
+   stage is sized before the browser build compiles. */
+
+.ttb-01 {
+  width: 100%;
+  min-height: 100svh;
+}

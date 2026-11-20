@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import type * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PageHeader } from "@/components/PageHeader";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { listarCargos } from "@/services/cargos";
 import { listarFuncionarios, salvarFuncionario, excluirFuncionario, type Funcionario } from "@/services/funcionarios";
@@ -54,24 +54,79 @@ function FuncionariosPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <PageHeader title="Funcionários" subtitle="Equipe que participa da escala de folgas."
-        action={<Button onClick={() => abrir(null)}><Plus /> Novo funcionário</Button>} />
-      <div className="rounded-xl border bg-card shadow-sm">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_var(--primary)]">
+            <Users className="size-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-foreground md:text-3xl">Funcionários</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Equipe que participa da escala de folgas.</p>
+          </div>
+        </div>
+        <Button onClick={() => abrir(null)} className="rounded-xl shadow-[0_8px_20px_-8px_var(--primary)] hover:brightness-110">
+          <Plus /> Novo funcionário
+        </Button>
+      </div>
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <Table>
-          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Cargo</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
+          <TableHeader className="bg-muted/50">
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="font-bold uppercase tracking-[0.14em] text-foreground">FUNCIONÁRIO</TableHead>
+              <TableHead className="font-bold uppercase tracking-[0.14em] text-muted-foreground">CARGO</TableHead>
+              <TableHead className="w-28 text-right"><span className="sr-only">Ações</span></TableHead>
+            </TableRow>
+          </TableHeader>
           <TableBody>
-            {isLoading ? <TableRow><TableCell colSpan={3} className="text-muted-foreground">Carregando…</TableCell></TableRow>
-            : funcionarios.length === 0 ? <TableRow><TableCell colSpan={3} className="py-10 text-center text-muted-foreground">Nenhum funcionário cadastrado ainda.</TableCell></TableRow>
-            : funcionarios.map((f) => (
-              <TableRow key={f.id}>
-                <TableCell><span className="flex min-w-0 items-center gap-3 font-semibold"><span className="size-3.5 shrink-0 rounded-full ring-2 ring-background" style={{ backgroundColor: f.cargos?.cor }} /><span className="min-w-0 rounded-md px-2 py-1 [overflow-wrap:anywhere]" style={{ backgroundColor: f.cargos?.cor, color: f.cargos?.cor ? textoSobreCor(f.cargos.cor) : undefined }}>{f.nome}</span></span></TableCell>
-                <TableCell className="text-muted-foreground">{f.cargos?.nome ?? "—"}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" aria-label="Editar" onClick={() => abrir(f)}><Pencil /></Button>
-                  <Button variant="ghost" size="icon" aria-label="Excluir" onClick={() => setExcluir(f)}><Trash2 className="text-destructive" /></Button>
+            {isLoading ? (
+              <TableRow className="border-border hover:bg-transparent">
+                <TableCell colSpan={3} className="px-5 py-12 text-center text-muted-foreground">Carregando…</TableCell>
+              </TableRow>
+            ) : funcionarios.length === 0 ? (
+              <TableRow className="border-border hover:bg-transparent">
+                <TableCell colSpan={3} className="px-5 py-12 text-center">
+                  <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                    <Users className="size-12 text-muted-foreground/40" aria-hidden="true" />
+                    <span>Nenhum funcionário cadastrado ainda.</span>
+                  </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              funcionarios.map((f) => (
+                  <TableRow
+                    key={f.id}
+                    style={{ "--cor": f.cargos?.cor } as React.CSSProperties}
+                    className="border-border transition-[background-color,box-shadow] duration-200 hover:bg-muted/50 hover:shadow-[inset_3px_0_0_var(--cor)]"
+                  >
+                    <TableCell>
+                      <span className="flex min-w-0 items-center gap-3 font-semibold">
+                        <span className="size-3.5 shrink-0 rounded-full ring-2 ring-background" style={{ backgroundColor: f.cargos?.cor }} />
+                        <span className="min-w-0 rounded-md px-2 py-1 [overflow-wrap:anywhere]" style={{ backgroundColor: f.cargos?.cor, color: f.cargos?.cor ? textoSobreCor(f.cargos.cor) : undefined }}>{f.nome}</span>
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {f.cargos?.cor ? (
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold text-foreground"
+                          style={{
+                            backgroundColor: "color-mix(in oklab, var(--cor) 15%, transparent)",
+                            borderColor: "color-mix(in oklab, var(--cor) 40%, transparent)",
+                          }}
+                        >
+                          <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--cor)" }} />
+                          {f.cargos.nome}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="size-10 rounded-xl text-muted-foreground transition hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring" aria-label={`Editar ${f.nome}`} onClick={() => abrir(f)}><Pencil /></Button>
+                      <Button variant="ghost" size="icon" className="size-10 rounded-xl text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring" aria-label={`Excluir ${f.nome}`} onClick={() => setExcluir(f)}><Trash2 /></Button>
+                    </TableCell>
+                  </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

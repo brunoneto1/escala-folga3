@@ -16,11 +16,11 @@ const itens = [
 export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="icon" className="border-r border-sidebar-border">
         <SidebarHeader className="px-4 py-5">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-extrabold text-sidebar-primary-foreground">F</div>
-            <span className="truncate text-base font-bold group-data-[collapsible=icon]:hidden">Gestor de escala</span>
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary font-extrabold text-sidebar-primary-foreground shadow-sm">F</div>
+            <span className="truncate text-base font-bold tracking-tight group-data-[collapsible=icon]:hidden">Gestor de escala</span>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -43,10 +43,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </SidebarContent>
       </Sidebar>
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="flex h-14 items-center border-b bg-card px-4">
+        <header className="flex h-14 items-center border-b border-border/70 bg-card px-4">
           <SidebarTrigger />
         </header>
-        <main className="flex-1 p-6 md:p-8">{children}</main>
+        <main className="flex-1 bg-background p-5 md:p-8">{children}</main>
       </div>
     </SidebarProvider>
   );

@@ -57,7 +57,7 @@ function CargosPage() {
     <div className="mx-auto max-w-4xl">
       <PageHeader title="Cargos" subtitle="Funções que os funcionários podem ocupar."
         action={<Button onClick={() => abrir(null)}><Plus /> Novo cargo</Button>} />
-      <div className="rounded-xl border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
         <Table>
           <TableHeader><TableRow><TableHead className="w-48 min-w-48">Nome</TableHead><TableHead>Funcionários</TableHead><TableHead className="w-28 text-right">Ações</TableHead></TableRow></TableHeader>
           <TableBody>

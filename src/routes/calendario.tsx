@@ -107,7 +107,7 @@ function CalendarioPage() {
   return (
     <div className={`mx-auto w-full ${visao === "tabela" ? "calendar-table-view flex min-h-0 flex-1 flex-col max-w-none" : "max-w-6xl"}`}>
       <h1 className="sr-only">Calendário</h1>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-lg border bg-card px-3 py-2 shadow-sm lg:flex-nowrap">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl border border-border/70 bg-card px-3 py-2 shadow-sm lg:flex-nowrap">
         <div className="flex min-w-0 flex-wrap items-center gap-1">
           <Button variant="outline" size="icon" className="size-8 shrink-0" aria-label="Mês anterior" onClick={() => andar(-1)}><ChevronLeft /></Button>
           <Button variant="outline" size="sm" className="h-8 shrink-0" onClick={() => setMes({ a: hoje.getFullYear(), m: hoje.getMonth() })}>Hoje</Button>
@@ -139,7 +139,7 @@ function CalendarioPage() {
 
       {visao === "calendario" ? (
         <>
-          <div className="hidden grid-cols-7 gap-px overflow-hidden rounded-xl border bg-border shadow-sm md:grid">
+          <div className="hidden grid-cols-7 gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/70 shadow-sm md:grid">
             {SEMANA.map((s) => <div key={s} className="bg-muted px-2 py-2 text-center text-xs font-bold uppercase text-muted-foreground">{s}</div>)}
             {celulas.map((d, i) => d === null ? <div key={`v${i}`} className="bg-card/50" /> : (
               <DiaCelula key={d} dataIso={iso(mes.a, mes.m, d)} numero={d} hoje={hojeIso} folgas={folgas} porId={porId} onClick={abrirDia} />
