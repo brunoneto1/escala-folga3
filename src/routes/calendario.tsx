@@ -327,7 +327,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
   }, [folgas]);
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border bg-card shadow-sm">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border">
       {funcionarios.length === 0 ? (
         <div className="px-4 py-10 text-center text-sm text-muted-foreground">Cadastre funcionários para montar a escala.</div>
       ) : (
@@ -345,11 +345,11 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
           })}
         </div>
         <div className="min-h-0 min-w-0 flex-1 overflow-auto">
-        <table className="w-full border-separate border-spacing-0 text-sm">
+        <table className="w-full border-collapse text-sm">
         <caption className="sr-only">Escala mensal de folgas por funcionário e cargo</caption>
         <thead>
           <tr>
-            <th scope="col" className="sticky left-0 top-0 z-40 h-7 w-56 min-w-56 max-w-56 border-b border-r bg-card px-2 py-0 text-left font-semibold">Funcionário / cargo</th>
+            <th scope="col" className="sticky left-0 top-0 z-40 h-7 w-56 min-w-56 max-w-56 border-b border-border bg-muted/50 px-2 py-0 text-left text-xs font-bold text-muted-foreground shadow-[1px_0_0_var(--border)]">Funcionário / cargo</th>
             {dias.map((numero) => {
               const data = iso(mes.a, mes.m, numero);
               const diaSemana = new Date(`${data}T12:00`).getDay();
@@ -357,17 +357,17 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
               const domingo = diaSemana === 0;
               const inicioSemana = domingo && numero !== 1;
               return (
-                <th key={data} scope="col" className={`sticky top-0 z-30 h-7 min-w-8 border-b border-r px-1 py-0 text-center ${domingo ? "bg-[#dea12f] text-foreground" : data === hoje ? "bg-primary/10" : "bg-muted"} ${data === hoje && domingo ? "ring-2 ring-inset ring-primary" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
-                  <button type="button" className={`flex w-full flex-col items-center rounded px-1 py-0 ${domingo ? "hover:bg-black/10" : "hover:bg-accent"}`} aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
-                    <span className="text-xs font-semibold">{numero}</span>
-                    <span className={`text-[10px] font-normal uppercase ${domingo ? "text-foreground" : "text-muted-foreground"}`}>{semana}</span>
+                <th key={data} scope="col" className={`sticky top-0 z-30 h-7 min-w-8 border-b border-border px-1 py-0 text-center text-xs font-bold text-muted-foreground ${domingo ? "bg-[#dea12f] text-foreground" : data === hoje ? "bg-primary/10" : "bg-muted/50"} ${data === hoje ? "border-t-[3px] border-t-[#ea6109]" : ""} ${data === hoje && domingo ? "ring-2 ring-inset ring-primary" : ""} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}>
+                  <button type="button" className={`flex w-full flex-col items-center rounded px-1 py-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${domingo ? "hover:bg-black/10" : "hover:bg-accent"}`} aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
+                    <span className={`text-xs ${data === hoje ? "text-primary" : "text-foreground"}`}>{numero}</span>
+                    <span className={data === hoje ? "text-[10px] font-extrabold uppercase tracking-[0.12em] text-primary" : "text-[10px] font-bold uppercase text-muted-foreground"}>{data === hoje ? "HOJE" : semana}</span>
                   </button>
                 </th>
               );
             })}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="[&_tr:last-child_th]:border-b-0 [&_tr:last-child_td]:border-b-0">
           {gruposVisiveis.length === 0 ? (
             <tr>
               <td colSpan={dias.length + 1} className="px-4 py-6 text-center text-sm text-muted-foreground">
@@ -377,17 +377,17 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
           ) : gruposVisiveis.map((grupo) => (
             <Fragment key={grupo.id}>
               <tr>
-                <th scope="rowgroup" className="sticky left-0 z-20 h-[22px] w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-3 py-0.5 text-left">
+                <th scope="rowgroup" className="sticky left-0 z-20 h-[22px] w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-3 py-0.5 text-left shadow-[1px_0_0_var(--border)]">
                   {grupo.cor ? (
                     <span className="rounded-md px-2 py-0 leading-5 text-xs font-semibold" style={{ backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) }}>{grupo.nome}</span>
                   ) : <span className="font-semibold">{grupo.nome}</span>}
                   <span className="ml-2 text-[11px] font-normal text-muted-foreground">{grupo.funcionarios.length} {grupo.funcionarios.length === 1 ? "funcionário" : "funcionários"}</span>
                 </th>
-                <td colSpan={dias.length} className="border-b border-r border-t bg-muted/60" />
+                <td colSpan={dias.length} className="border-b border-border/60 border-t border-border/60 bg-muted/40" />
               </tr>
               {grupo.funcionarios.map((funcionario) => (
                 <tr key={funcionario.id} className="hover:bg-muted/20">
-                  <th scope="row" className="sticky left-0 z-20 h-6 w-56 min-w-56 max-w-56 border-b border-r bg-card px-2 py-0 text-left text-xs leading-4 font-medium">
+                  <th scope="row" className="sticky left-0 z-20 h-6 w-56 min-w-56 max-w-56 border-b border-border/60 bg-muted/50 px-2 py-0 text-left text-xs leading-4 font-medium shadow-[1px_0_0_var(--border)]">
                     <span className="block min-w-0 truncate" title={funcionario.nome}>{funcionario.nome}</span>
                   </th>
                   {dias.map((numero) => {
@@ -397,8 +397,8 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
                     const folga = folgasPorCelula.get(`${funcionario.id}:${data}`);
                     const nomeData = new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
                     return (
-                      <td key={data} className={`h-6 min-w-8 border-b border-r p-0 text-center ${domingo && !folga ? "bg-[#dea12f]/25" : ""} ${folga && !grupo.cor ? "bg-muted" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor } : undefined}>
-                        <button type="button" className={`h-6 w-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${folga ? "block rounded-none bg-transparent text-center text-[11px] font-semibold" : "hover:bg-accent"}`} style={folga && grupo.cor ? { color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
+                      <td key={data} className={`h-6 min-w-8 border-b border-border/60 p-0 text-center ${domingo && !folga ? "bg-[#dea12f]/25" : data === hoje && !folga ? "bg-primary/5" : ""} ${folga && !grupo.cor ? "bg-muted" : ""} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor } : undefined}>
+                        <button type="button" className={`h-6 w-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${folga ? "block rounded-none bg-transparent text-center text-[11px] font-semibold" : "hover:bg-accent/60"}`} style={folga && grupo.cor ? { color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
                           {folga ? folga.tipo?.sigla ?? "F" : null}
                         </button>
                       </td>
@@ -409,14 +409,14 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
             </Fragment>
           ))}
         </tbody>
-        <tfoot id="cobertura-escala" hidden={!mostrarCobertura}>
+        <tfoot id="cobertura-escala" hidden={!mostrarCobertura} className="[&_tr:last-child_th]:border-b-0 [&_tr:last-child_td]:border-b-0">
           <tr>
-            <th className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground">Cobertura por cargo — pessoas trabalhando</th>
-            <td colSpan={dias.length} className="border-b border-r border-t bg-muted" />
+            <th className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground shadow-[1px_0_0_var(--border)]">Cobertura por cargo — pessoas trabalhando</th>
+            <td colSpan={dias.length} className="border-b border-border/60 border-t border-border/60 bg-muted/40" />
           </tr>
           {gruposVisiveis.map((grupo) => (
             <tr key={grupo.id} className="bg-muted/60 font-semibold">
-              <th scope="row" className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-2 py-0.5 text-left text-xs">
+              <th scope="row" className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-2 py-0.5 text-left text-xs shadow-[1px_0_0_var(--border)]">
                 <span className="block min-w-0 truncate">{grupo.nome}</span>
               </th>
               {dias.map((numero) => {
@@ -425,7 +425,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
                 const inicioSemana = domingo && numero !== 1;
                 const ausentes = ausentesPorDia.get(data);
                 const cobertura = grupo.funcionarios.reduce((total, funcionario) => total + (ausentes?.has(funcionario.id) ? 0 : 1), 0);
-                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className={`min-w-8 border-b border-r border-t px-0.5 py-1 text-center text-xs ${domingo ? "bg-[#dea12f]/25" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>{cobertura}</td>;
+                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className={`min-w-8 border-b border-border/60 border-t border-border/60 px-0.5 py-1 text-center text-xs ${domingo ? "bg-[#dea12f]/25" : "bg-muted/40"} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}>{cobertura}</td>;
               })}
             </tr>
           ))}

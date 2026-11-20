@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tailwind Weekly Class Schedule Timetable</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap">
+  <style type="text/tailwindcss">
+  @import "tailwindcss";
+  @theme {
+    --color-ttb10-bg: #0c0c16;
+    --color-ttb10-bg: oklch(0.16 0.02 285);
+    --color-ttb10-surface: #13131f;
+    --color-ttb10-surface: oklch(0.2 0.022 285);
+    --color-ttb10-time: #181826;
+    --color-ttb10-time: oklch(0.22 0.025 285);
+    --color-ttb10-line: #26263d;
+    --color-ttb10-line: oklch(0.3 0.035 285);
+    --color-ttb10-ink: #ececf9;
+    --color-ttb10-ink: oklch(0.94 0.015 285);
+    --color-ttb10-mut: #9d9db9;
+    --color-ttb10-mut: oklch(0.72 0.035 285);
+    --color-ttb10-yoga: #fb7185;
+    --color-ttb10-yoga: oklch(0.72 0.17 12);
+    --color-ttb10-hiit: #fb923c;
+    --color-ttb10-hiit: oklch(0.76 0.16 55);
+    --color-ttb10-spin: #c084fc;
+    --color-ttb10-spin: oklch(0.72 0.18 305);
+    --color-ttb10-pilates: #22d3ee;
+    --color-ttb10-pilates: oklch(0.8 0.13 210);
+    --color-ttb10-boxing: #facc15;
+    --color-ttb10-boxing: oklch(0.86 0.17 92);
+    --color-ttb10-strength: #34d399;
+    --color-ttb10-strength: oklch(0.78 0.15 165);
+    --font-ttb10-sans: 'Bricolage Grotesque', system-ui, sans-serif;
+  }
+  /* Root rule: the full-bleed contract, stated in CSS as well as in the markup's utilities, so the
+     stage is sized before the browser build compiles. */
+  .ttb-10 {
+    width: 100%;
+    min-height: 100svh;
+  }
+
+  </style>
+</head>
+<body>
+  <section class="ttb-10 grid-cols-1 group/tt w-full min-h-svh grid place-items-center bg-ttb10-bg px-4 py-14 font-ttb10-sans text-ttb10-ink" aria-label="Weekly class schedule timetable demo">
+    <div class="w-full max-w-6xl">
+      <header class="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-extrabold tracking-[-0.02em]">Studio class schedule</h2>
+          <p class="mt-1 text-sm text-ttb10-mut">Week of Jun 23 – 29 · tap a type to filter</p>
+        </div>
+        <div class="flex gap-1.5">
+          <a href="#" aria-label="Previous week" class="grid size-11 place-items-center rounded-xl text-ttb10-mut ring-1 ring-ttb10-line transition hover:text-ttb10-ink focus-visible:outline-2 focus-visible:outline-ttb10-yoga"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></a>
+          <a href="#" aria-label="Next week" class="grid size-11 place-items-center rounded-xl text-ttb10-mut ring-1 ring-ttb10-line transition hover:text-ttb10-ink focus-visible:outline-2 focus-visible:outline-ttb10-yoga"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        </div>
+      </header>
+      <fieldset class="mb-5 flex flex-wrap gap-2">
+        <legend class="sr-only">Show class types</legend>
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-ttb10-mut ring-1 ring-ttb10-line transition has-checked:bg-ttb10-yoga/12 has-checked:text-ttb10-ink has-checked:ring-ttb10-yoga/50 has-focus-visible:outline-2 has-focus-visible:outline-ttb10-yoga"><input id="ttb10-yoga" type="checkbox" checked class="sr-only"><span aria-hidden="true" class="size-2 rounded-sm bg-ttb10-yoga"></span>Yoga</label>
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-ttb10-mut ring-1 ring-ttb10-line transition has-checked:bg-ttb10-hiit/12 has-checked:text-ttb10-ink has-checked:ring-ttb10-hiit/50 has-focus-visible:outline-2 has-focus-visible:outline-ttb10-hiit"><input id="ttb10-hiit" type="checkbox" checked class="sr-only"><span aria-hidden="true" class="size-2 rounded-sm bg-ttb10-hiit"></span>HIIT</label>
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-ttb10-mut ring-1 ring-ttb10-line transition has-checked:bg-ttb10-spin/12 has-checked:text-ttb10-ink has-checked:ring-ttb10-spin/50 has-focus-visible:outline-2 has-focus-visible:outline-ttb10-spin"><input id="ttb10-spin" type="checkbox" checked class="sr-only"><span aria-hidden="true" class="size-2 rounded-sm bg-ttb10-spin"></span>Spin</label>
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-ttb10-mut ring-1 ring-ttb10-line transition has-checked:bg-ttb10-pilates/12 has-checked:text-ttb10-ink has-checked:ring-ttb10-pilates/50 has-focus-visible:outline-2 has-focus-visible:outline-ttb10-pilates"><input id="ttb10-pilates" type="checkbox" checked class="sr-only"><span aria-hidden="true" class="size-2 rounded-sm bg-ttb10-pilates"></span>Pilates</label>
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-ttb10-mut ring-1 ring-ttb10-line transition has-checked:bg-ttb10-boxing/12 has-checked:text-ttb10-ink has-checked:ring-ttb10-boxing/50 has-focus-visible:outline-2 has-focus-visible:outline-ttb10-boxing"><input id="ttb10-boxing" type="checkbox" checked class="sr-only"><span aria-hidden="true" class="size-2 rounded-sm bg-ttb10-boxing"></span>Boxing</label>
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-ttb10-mut ring-1 ring-ttb10-line transition has-checked:bg-ttb10-strength/12 has-checked:text-ttb10-ink has-checked:ring-ttb10-strength/50 has-focus-visible:outline-2 has-focus-visible:outline-ttb10-strength"><input id="ttb10-strength" type="checkbox" checked class="sr-only"><span aria-hidden="true" class="size-2 rounded-sm bg-ttb10-strength"></span>Strength</label>
+      </fieldset>
+      <div class="relative overflow-x-auto rounded-2xl bg-ttb10-surface ring-1 ring-ttb10-line">
+        <table class="w-full min-w-[820px] table-fixed border-collapse text-left">
+          <caption class="sr-only">Weekly class schedule, Monday 23 to Sunday 29 June</caption>
+          <thead class="[&_th]:border-b [&_th]:border-ttb10-line [&_th]:px-2 [&_th]:py-3 [&_th]:text-center [&_th]:text-xs [&_th]:font-bold [&_th]:text-ttb10-mut">
+            <tr>
+              <th scope="col" class="sticky left-0 z-10 w-20 bg-ttb10-time text-left! pl-4!">Time</th>
+              <th scope="col">Mon 23</th><th scope="col">Tue 24</th><th scope="col">Wed 25</th>
+              <th scope="col" aria-current="date" class="bg-white/[0.04] text-ttb10-ink! after:mt-0.5 after:block after:text-[10px] after:font-extrabold after:tracking-[0.12em] after:text-ttb10-yoga after:uppercase after:content-['Today']">Thu 26</th>
+              <th scope="col">Fri 27</th><th scope="col">Sat 28</th><th scope="col">Sun 29</th>
+            </tr>
+          </thead>
+          <tbody class="[&_td]:h-[4.5rem] [&_td]:p-1.5 [&_td]:align-top [&_td:nth-child(5)]:bg-white/[0.03] [&_tr]:border-b [&_tr]:border-ttb10-line [&_tr:last-child]:border-0 [&_button]:flex [&_button]:size-full [&_button]:flex-col [&_button]:justify-center [&_button]:gap-0.5 [&_button]:rounded-lg [&_button]:border-l-[3px] [&_button]:px-2.5 [&_button]:py-1.5 [&_button]:text-left [&_button]:transition [&_button]:duration-200 [&_button:hover]:-translate-y-0.5 [&_button:hover]:shadow-[0_10px_24px_-10px_currentColor] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-current [&_[data-k=yoga]]:border-ttb10-yoga [&_[data-k=yoga]]:bg-ttb10-yoga/14 [&_[data-k=yoga]]:text-ttb10-yoga [&_[data-k=hiit]]:border-ttb10-hiit [&_[data-k=hiit]]:bg-ttb10-hiit/14 [&_[data-k=hiit]]:text-ttb10-hiit [&_[data-k=spin]]:border-ttb10-spin [&_[data-k=spin]]:bg-ttb10-spin/14 [&_[data-k=spin]]:text-ttb10-spin [&_[data-k=pilates]]:border-ttb10-pilates [&_[data-k=pilates]]:bg-ttb10-pilates/14 [&_[data-k=pilates]]:text-ttb10-pilates [&_[data-k=boxing]]:border-ttb10-boxing [&_[data-k=boxing]]:bg-ttb10-boxing/14 [&_[data-k=boxing]]:text-ttb10-boxing [&_[data-k=strength]]:border-ttb10-strength [&_[data-k=strength]]:bg-ttb10-strength/14 [&_[data-k=strength]]:text-ttb10-strength group-has-[#ttb10-yoga:not(:checked)]/tt:[&_[data-k=yoga]]:pointer-events-none group-has-[#ttb10-yoga:not(:checked)]/tt:[&_[data-k=yoga]]:opacity-15 group-has-[#ttb10-hiit:not(:checked)]/tt:[&_[data-k=hiit]]:pointer-events-none group-has-[#ttb10-hiit:not(:checked)]/tt:[&_[data-k=hiit]]:opacity-15 group-has-[#ttb10-spin:not(:checked)]/tt:[&_[data-k=spin]]:pointer-events-none group-has-[#ttb10-spin:not(:checked)]/tt:[&_[data-k=spin]]:opacity-15 group-has-[#ttb10-pilates:not(:checked)]/tt:[&_[data-k=pilates]]:pointer-events-none group-has-[#ttb10-pilates:not(:checked)]/tt:[&_[data-k=pilates]]:opacity-15 group-has-[#ttb10-boxing:not(:checked)]/tt:[&_[data-k=boxing]]:pointer-events-none group-has-[#ttb10-boxing:not(:checked)]/tt:[&_[data-k=boxing]]:opacity-15 group-has-[#ttb10-strength:not(:checked)]/tt:[&_[data-k=strength]]:pointer-events-none group-has-[#ttb10-strength:not(:checked)]/tt:[&_[data-k=strength]]:opacity-15 [&_b]:text-xs [&_b]:leading-tight [&_b]:font-bold [&_small]:text-[10.5px] [&_small]:text-ttb10-ink/75">
+            <tr>
+              <th scope="row" class="sticky left-0 z-10 bg-ttb10-time pl-4 text-xs font-semibold whitespace-nowrap text-ttb10-mut shadow-[1px_0_0_var(--color-ttb10-line)]">6:00 AM</th>
+              <td><button type="button" data-k="yoga"><b>Morning Flow</b><small>Maya S. · 8 left</small></button></td>
+              <td></td>
+              <td><button type="button" data-k="hiit"><b>HIIT Blast</b><small>Diego R. · Full</small></button></td>
+              <td><button type="button" data-k="spin"><b>Spin Express</b><small>Leah T. · 3 left</small></button></td>
+              <td></td>
+              <td><button type="button" data-k="strength"><b>Power Lift</b><small>Max C. · 6 left</small></button></td>
+              <td></td>
+            </tr>
+            <tr>
+              <th scope="row" class="sticky left-0 z-10 bg-ttb10-time pl-4 text-xs font-semibold whitespace-nowrap text-ttb10-mut shadow-[1px_0_0_var(--color-ttb10-line)]">9:00 AM</th>
+              <td></td>
+              <td><button type="button" data-k="pilates"><b>Pilates Core</b><small>Nina B. · 5 left</small></button></td>
+              <td><button type="button" data-k="yoga"><b>Vinyasa</b><small>Maya S. · 2 left</small></button></td>
+              <td><button type="button" data-k="boxing"><b>Box Fit</b><small>Jake O. · 9 left</small></button></td>
+              <td><button type="button" data-k="pilates"><b>Reformer</b><small>Nina B. · Full</small></button></td>
+              <td><button type="button" data-k="yoga"><b>Yin Yoga</b><small>Maya S. · 11 left</small></button></td>
+              <td><button type="button" data-k="hiit"><b>Sunday Burn</b><small>Diego R. · 4 left</small></button></td>
+            </tr>
+            <tr>
+              <th scope="row" class="sticky left-0 z-10 bg-ttb10-time pl-4 text-xs font-semibold whitespace-nowrap text-ttb10-mut shadow-[1px_0_0_var(--color-ttb10-line)]">12:00 PM</th>
+              <td><button type="button" data-k="strength"><b>Lunch Lift</b><small>Max C. · 7 left</small></button></td>
+              <td><button type="button" data-k="boxing"><b>Kickbox</b><small>Jake O. · 3 left</small></button></td>
+              <td></td>
+              <td></td>
+              <td><button type="button" data-k="spin"><b>Sprint Cycle</b><small>Leah T. · 6 left</small></button></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <th scope="row" class="sticky left-0 z-10 bg-ttb10-time pl-4 text-xs font-semibold whitespace-nowrap text-ttb10-mut shadow-[1px_0_0_var(--color-ttb10-line)]">5:30 PM</th>
+              <td><button type="button" data-k="hiit"><b>HIIT Storm</b><small>Diego R. · 2 left</small></button></td>
+              <td><button type="button" data-k="spin"><b>Evening Ride</b><small>Leah T. · Full</small></button></td>
+              <td><button type="button" data-k="boxing"><b>Muay Thai</b><small>Jake O. · 5 left</small></button></td>
+              <td><button type="button" data-k="yoga"><b>Restorative</b><small>Maya S. · 10 left</small></button></td>
+              <td><button type="button" data-k="strength"><b>Barbell Club</b><small>Max C. · 4 left</small></button></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <th scope="row" class="sticky left-0 z-10 bg-ttb10-time pl-4 text-xs font-semibold whitespace-nowrap text-ttb10-mut shadow-[1px_0_0_var(--color-ttb10-line)]">7:00 PM</th>
+              <td><button type="button" data-k="pilates"><b>Night Pilates</b><small>Nina B. · 8 left</small></button></td>
+              <td></td>
+              <td><button type="button" data-k="strength"><b>Strength Max</b><small>Max C. · 6 left</small></button></td>
+              <td><button type="button" data-k="hiit"><b>Night HIIT</b><small>Diego R. · 1 left</small></button></td>
+              <td><button type="button" data-k="yoga"><b>Wind Down</b><small>Maya S. · 12 left</small></button></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
