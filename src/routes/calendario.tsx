@@ -333,7 +333,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
         <caption className="sr-only">Escala mensal de folgas por funcionário e cargo</caption>
         <thead>
           <tr>
-            <th scope="col" className="sticky left-0 top-0 z-40 min-w-44 border-b border-r bg-card px-2 py-0.5 text-left font-semibold">Funcionário / cargo</th>
+            <th scope="col" className="sticky left-0 top-0 z-40 h-7 w-56 min-w-56 max-w-56 border-b border-r bg-card px-2 py-0 text-left font-semibold">Funcionário / cargo</th>
             {dias.map((numero) => {
               const data = iso(mes.a, mes.m, numero);
               const diaSemana = new Date(`${data}T12:00`).getDay();
@@ -341,10 +341,10 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
               const domingo = diaSemana === 0;
               const inicioSemana = domingo && numero !== 1;
               return (
-                <th key={data} scope="col" className={`sticky top-0 z-30 min-w-8 border-b border-r px-1 py-0.5 text-center ${data === hoje ? "bg-primary/10" : domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
-                  <button type="button" className="flex w-full flex-col items-center rounded px-1 py-0 hover:bg-accent" aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
+                <th key={data} scope="col" className={`sticky top-0 z-30 h-7 min-w-8 border-b border-r px-1 py-0 text-center ${domingo ? "bg-[#dea12f] text-foreground" : data === hoje ? "bg-primary/10" : "bg-muted"} ${data === hoje && domingo ? "ring-2 ring-inset ring-primary" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
+                  <button type="button" className={`flex w-full flex-col items-center rounded px-1 py-0 ${domingo ? "hover:bg-black/10" : "hover:bg-accent"}`} aria-label={`Abrir folgas de ${new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}`} onClick={() => onCellClick(data)}>
                     <span className="text-xs font-semibold">{numero}</span>
-                    <span className="text-[10px] font-normal uppercase text-muted-foreground">{semana}</span>
+                    <span className={`text-[10px] font-normal uppercase ${domingo ? "text-foreground" : "text-muted-foreground"}`}>{semana}</span>
                   </button>
                 </th>
               );
@@ -355,9 +355,9 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
           {grupos.map((grupo) => (
             <Fragment key={grupo.id}>
               <tr>
-                <th scope="rowgroup" className="sticky left-0 z-20 min-w-44 border-b border-r border-t bg-muted px-3 py-1 text-left">
+                <th scope="rowgroup" className="sticky left-0 z-20 h-[22px] w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-3 py-0.5 text-left">
                   {grupo.cor ? (
-                    <span className="rounded-md px-2 py-0.5 text-xs font-semibold" style={{ backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) }}>{grupo.nome}</span>
+                    <span className="rounded-md px-2 py-0 leading-5 text-xs font-semibold" style={{ backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) }}>{grupo.nome}</span>
                   ) : <span className="font-semibold">{grupo.nome}</span>}
                   <span className="ml-2 text-[11px] font-normal text-muted-foreground">{grupo.funcionarios.length} {grupo.funcionarios.length === 1 ? "funcionário" : "funcionários"}</span>
                 </th>
@@ -365,8 +365,8 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
               </tr>
               {grupo.funcionarios.map((funcionario) => (
                 <tr key={funcionario.id} className="hover:bg-muted/20">
-                  <th scope="row" className="sticky left-0 z-20 min-w-44 border-b border-r bg-card px-2 py-0.5 text-left text-xs font-medium">
-                    <span className="block min-w-0 [overflow-wrap:anywhere]">{funcionario.nome}</span>
+                  <th scope="row" className="sticky left-0 z-20 h-6 w-56 min-w-56 max-w-56 border-b border-r bg-card px-2 py-0 text-left text-xs leading-4 font-medium">
+                    <span className="block min-w-0 truncate" title={funcionario.nome}>{funcionario.nome}</span>
                   </th>
                   {dias.map((numero) => {
                     const data = iso(mes.a, mes.m, numero);
@@ -375,8 +375,8 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
                     const folga = folgasPorCelula.get(`${funcionario.id}:${data}`);
                     const nomeData = new Date(`${data}T12:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
                     return (
-                      <td key={data} className={`min-w-8 border-b border-r p-0.5 text-center ${domingo ? "bg-muted/40" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>
-                        <button type="button" className={`h-6 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? (grupo.cor ? "font-semibold" : "bg-muted font-semibold") : "hover:bg-accent"}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor, color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
+                      <td key={data} className={`h-6 min-w-8 border-b border-r p-0 text-center ${domingo && !folga ? "bg-[#dea12f]/25" : ""} ${folga && !grupo.cor ? "bg-muted" : ""} ${inicioSemana ? "border-l-2 border-l-border" : ""}`} style={folga && grupo.cor ? { backgroundColor: grupo.cor } : undefined}>
+                        <button type="button" className={`h-6 w-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${folga ? "block rounded-none bg-transparent text-center text-[11px] font-semibold" : "hover:bg-accent"}`} style={folga && grupo.cor ? { color: textoSobreCor(grupo.cor) } : undefined} aria-label={folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`} title={folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`} onClick={() => onCellClick(data)}>
                           {folga ? folga.tipo?.sigla ?? "F" : null}
                         </button>
                       </td>
@@ -389,12 +389,12 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
         </tbody>
         <tfoot id="cobertura-escala" hidden={!mostrarCobertura}>
           <tr>
-            <th className="sticky left-0 z-20 min-w-44 border-b border-r border-t bg-muted px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground">Cobertura por cargo — pessoas trabalhando</th>
+            <th className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground">Cobertura por cargo — pessoas trabalhando</th>
             <td colSpan={dias.length} className="border-b border-r border-t bg-muted" />
           </tr>
           {grupos.map((grupo) => (
             <tr key={grupo.id} className="bg-muted/60 font-semibold">
-              <th scope="row" className="sticky left-0 z-20 min-w-44 border-b border-r border-t bg-muted px-2 py-0.5 text-left text-xs">
+              <th scope="row" className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-r border-t bg-muted px-2 py-0.5 text-left text-xs">
                 <span className="block min-w-0 truncate">{grupo.nome}</span>
               </th>
               {dias.map((numero) => {
@@ -403,7 +403,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
                 const inicioSemana = domingo && numero !== 1;
                 const ausentes = ausentesPorDia.get(data);
                 const cobertura = grupo.funcionarios.reduce((total, funcionario) => total + (ausentes?.has(funcionario.id) ? 0 : 1), 0);
-                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className={`min-w-8 border-b border-r border-t px-0.5 py-1 text-center text-xs ${domingo ? "bg-muted-foreground/10" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>{cobertura}</td>;
+                return <td key={data} title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`} className={`min-w-8 border-b border-r border-t px-0.5 py-1 text-center text-xs ${domingo ? "bg-[#dea12f]/25" : "bg-muted"} ${inicioSemana ? "border-l-2 border-l-border" : ""}`}>{cobertura}</td>;
               })}
             </tr>
           ))}
