@@ -279,7 +279,7 @@ function SecaoFolgasDia({ titulo, tipo, grupos, contagem, folgaPorFuncionario, t
                             <span aria-hidden="true" className={`flex w-full min-w-0 justify-center overflow-hidden rounded-md border border-dashed px-2.5 py-1.5 text-xs font-semibold leading-none ${folga.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`}>
                               {folga.tipo?.sigla ?? "+ tipo"}
                             </span>
-                            <select className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed" value={folga.tipo_id ?? ""} aria-label={`Trocar tipo da folga de ${funcionario.nome}`} title={folga.tipo ? `Tipo atual: ${folga.tipo.nome}` : "Adicionar tipo à folga"} disabled={atualizandoTipo} onChange={(e) => onMudarTipo(folga.id, e.target.value || null)}>
+                            <select className="absolute inset-0 h-full w-full cursor-pointer bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground opacity-0 disabled:cursor-not-allowed" value={folga.tipo_id ?? ""} aria-label={`Trocar tipo da folga de ${funcionario.nome}`} title={folga.tipo ? `Tipo atual: ${folga.tipo.nome}` : "Adicionar tipo à folga"} disabled={atualizandoTipo} onChange={(e) => onMudarTipo(folga.id, e.target.value || null)}>
                               <option value="">Folga comum</option>
                               {tiposFolga.map((tipoFolga) => <option key={tipoFolga.id} value={tipoFolga.id}>{tipoFolga.sigla} — {tipoFolga.nome}</option>)}
                             </select>
