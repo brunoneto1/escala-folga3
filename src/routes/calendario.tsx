@@ -411,7 +411,7 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, onCel
         </tbody>
         <tfoot id="cobertura-escala" hidden={!mostrarCobertura} className="[&_tr:last-child_th]:border-b-0 [&_tr:last-child_td]:border-b-0">
           <tr>
-            <th className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground shadow-[1px_0_0_var(--border)]">Cobertura por cargo — pessoas trabalhando</th>
+            <th className="sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground shadow-[1px_0_0_var(--border)]"> Funcionários trabalhando</th>
             <td colSpan={dias.length} className="border-b border-border/60 border-t border-border/60 bg-muted/40" />
           </tr>
           {gruposVisiveis.map((grupo) => (
