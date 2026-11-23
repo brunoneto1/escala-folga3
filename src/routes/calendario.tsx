@@ -23,6 +23,13 @@ import { listarFolgas, criarFolga, excluirFolga, atualizarTipoFolga } from "@/se
 import { listarTiposFolga } from "@/services/tiposFolga";
 import { CONFIG_PADRAO, verificarFolga, type ConfigEscala } from "@/rules";
 import { textoSobreCor } from "@/lib/cores";
+import {
+  cargaDiariaMinutos,
+  formatarDuracao,
+  formatarJornadaCompacta,
+  normalizarHora,
+  type Jornada,
+} from "@/lib/jornada";
 
 export const Route = createFileRoute("/calendario")({
   head: () => ({
@@ -43,6 +50,19 @@ const SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const pad = (n: number) => String(n).padStart(2, "0");
 const iso = (a: number, m: number, d: number) => `${a}-${pad(m + 1)}-${pad(d)}`;
 const CHAVE = "escala-config";
+const LARGURA_COLUNA_NOMES = "14rem";
+
+function resumoJornada(jornada: Jornada): string {
+  const partes: string[] = [];
+  if (jornada.entrada) partes.push(`Entrada ${jornada.entrada}`);
+  if (jornada.saida) partes.push(`Saída ${jornada.saida}`);
+  if (jornada.intervalo_inicio && jornada.intervalo_fim) {
+    partes.push(`Intervalo ${jornada.intervalo_inicio}–${jornada.intervalo_fim}`);
+  }
+  const carga = cargaDiariaMinutos(jornada);
+  if (carga !== null) partes.push(`Carga ${formatarDuracao(carga)}`);
+  return partes.length > 0 ? partes.join(" · ") : "—";
+}
 
 function CalendarioPage() {
   const qc = useQueryClient();
@@ -60,6 +80,7 @@ function CalendarioPage() {
   const [mes, setMes] = useState({ a: hoje.getFullYear(), m: hoje.getMonth() });
   const [visao, setVisao] = useState<"calendario" | "tabela">("calendario");
   const [mostrarCobertura, setMostrarCobertura] = useState(false);
+  const [mostrarJornada, setMostrarJornada] = useState(false);
   const [config, setConfig] = useState<ConfigEscala>(CONFIG_PADRAO);
   const [dia, setDia] = useState<string | null>(null);
   const [funcionarioPendenteId, setFuncionarioPendenteId] = useState<string | null>(null);
@@ -275,16 +296,27 @@ function CalendarioPage() {
             </Button>
           </div>
           {visao === "tabela" && funcionarios.length > 0 && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              aria-expanded={mostrarCobertura}
-              aria-controls="cobertura-escala"
-              onClick={() => setMostrarCobertura((mostrar) => !mostrar)}
-            >
-              {mostrarCobertura ? "Ocultar cobertura" : "Mostrar cobertura"}
-            </Button>
+            <>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                aria-expanded={mostrarCobertura}
+                aria-controls="cobertura-escala"
+                onClick={() => setMostrarCobertura((mostrar) => !mostrar)}
+              >
+                {mostrarCobertura ? "Ocultar cobertura" : "Mostrar cobertura"}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                aria-pressed={mostrarJornada}
+                onClick={() => setMostrarJornada((mostrar) => !mostrar)}
+              >
+                {mostrarJornada ? "Ocultar jornada" : "Mostrar jornada"}
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -338,6 +370,7 @@ function CalendarioPage() {
           folgas={folgas}
           hoje={hojeIso}
           mostrarCobertura={mostrarCobertura}
+          mostrarJornada={mostrarJornada}
           onCellClick={abrirDia}
         />
       )}
@@ -487,6 +520,15 @@ function CalendarioPage() {
 type Fn = Awaited<ReturnType<typeof listarFuncionarios>>[number];
 type GrupoTabela = { id: string; nome: string; cor?: string; funcionarios: Fn[] };
 type GrupoDia = GrupoTabela & { totalCargo: number; deFolga: Fn[]; trabalhando: Fn[] };
+
+function jornadaDoFuncionario(funcionario: Fn): Jornada {
+  return {
+    entrada: normalizarHora(funcionario.entrada),
+    saida: normalizarHora(funcionario.saida),
+    intervalo_inicio: normalizarHora(funcionario.intervalo_inicio),
+    intervalo_fim: normalizarHora(funcionario.intervalo_fim),
+  };
+}
 
 function agruparFuncionarios(funcionarios: Fn[]): GrupoTabela[] {
   const porCargo = new Map<string, GrupoTabela>();
@@ -659,6 +701,7 @@ function TabelaEscala({
   folgas,
   hoje,
   mostrarCobertura,
+  mostrarJornada,
   onCellClick,
 }: {
   mes: { a: number; m: number };
@@ -666,6 +709,7 @@ function TabelaEscala({
   folgas: Awaited<ReturnType<typeof listarFolgas>>;
   hoje: string;
   mostrarCobertura: boolean;
+  mostrarJornada: boolean;
   onCellClick: (data: string) => void;
 }) {
   const grupos = useMemo(() => agruparFuncionarios(funcionarios), [funcionarios]);
@@ -753,6 +797,15 @@ function TabelaEscala({
                   >
                     Funcionário / cargo
                   </th>
+                  {mostrarJornada && (
+                    <th
+                      scope="col"
+                      style={{ left: LARGURA_COLUNA_NOMES }}
+                      className="sticky top-0 z-40 h-7 w-44 min-w-44 max-w-44 border-b border-border bg-muted/50 px-2 py-0 text-left text-xs font-bold text-muted-foreground shadow-[1px_0_0_var(--border)]"
+                    >
+                      Jornada
+                    </th>
+                  )}
                   {dias.map((numero) => {
                     const data = iso(mes.a, mes.m, numero);
                     const diaSemana = new Date(`${data}T12:00`).getDay();
@@ -795,7 +848,7 @@ function TabelaEscala({
                 {gruposVisiveis.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={dias.length + 1}
+                      colSpan={dias.length + 1 + Number(mostrarJornada)}
                       className="px-4 py-6 text-center text-sm text-muted-foreground"
                     >
                       Nenhum cargo selecionado.{" "}
@@ -835,7 +888,7 @@ function TabelaEscala({
                           </span>
                         </th>
                         <td
-                          colSpan={dias.length}
+                          colSpan={dias.length + Number(mostrarJornada)}
                           className="border-b border-border/60 border-t border-border/60 bg-muted/40"
                         />
                       </tr>
@@ -845,10 +898,22 @@ function TabelaEscala({
                             scope="row"
                             className="sticky left-0 z-20 h-6 w-56 min-w-56 max-w-56 border-b border-border/60 bg-muted/50 px-2 py-0 text-left text-xs leading-4 font-medium shadow-[1px_0_0_var(--border)]"
                           >
-                            <span className="block min-w-0 truncate" title={funcionario.nome}>
+                            <span
+                              className="block min-w-0 truncate"
+                              title={resumoJornada(jornadaDoFuncionario(funcionario))}
+                            >
                               {funcionario.nome}
                             </span>
                           </th>
+                          {mostrarJornada && (
+                            <td
+                              style={{ left: LARGURA_COLUNA_NOMES }}
+                              title={resumoJornada(jornadaDoFuncionario(funcionario))}
+                              className="sticky z-20 h-6 w-44 min-w-44 max-w-44 truncate border-b border-border/60 bg-muted/50 px-2 py-0 text-[11px] tabular-nums text-muted-foreground whitespace-nowrap shadow-[1px_0_0_var(--border)]"
+                            >
+                              {formatarJornadaCompacta(jornadaDoFuncionario(funcionario))}
+                            </td>
+                          )}
                           {dias.map((numero) => {
                             const data = iso(mes.a, mes.m, numero);
                             const domingo = new Date(`${data}T12:00`).getDay() === 0;
@@ -909,7 +974,7 @@ function TabelaEscala({
                     Funcionários trabalhando
                   </th>
                   <td
-                    colSpan={dias.length}
+                    colSpan={dias.length + Number(mostrarJornada)}
                     className="border-b border-border/60 border-t border-border/60 bg-muted/40"
                   />
                 </tr>
@@ -921,6 +986,9 @@ function TabelaEscala({
                     >
                       <span className="block min-w-0 truncate">{grupo.nome}</span>
                     </th>
+                    {mostrarJornada && (
+                      <td className="border-b border-border/60 border-t border-border/60 bg-muted/40" />
+                    )}
                     {dias.map((numero) => {
                       const data = iso(mes.a, mes.m, numero);
                       const domingo = new Date(`${data}T12:00`).getDay() === 0;
