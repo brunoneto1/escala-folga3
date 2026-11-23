@@ -16,8 +16,15 @@ export async function listarFolgas(): Promise<Folga[]> {
   return data;
 }
 export async function criarFolga(funcionario_id: string, data: string, tipo_id?: string | null) {
-  const { error } = await supabase.from("folgas").insert({ funcionario_id, data, tipo_id: tipo_id || null });
-  if (error) throw new Error(error.code === "23505" ? "Este funcionário já tem folga neste dia." : "Não foi possível salvar a folga.");
+  const { error } = await supabase
+    .from("folgas")
+    .insert({ funcionario_id, data, tipo_id: tipo_id || null });
+  if (error)
+    throw new Error(
+      error.code === "23505"
+        ? "Este funcionário já tem folga neste dia."
+        : "Não foi possível salvar a folga.",
+    );
 }
 
 export async function atualizarTipoFolga(id: string, tipo_id: string | null) {

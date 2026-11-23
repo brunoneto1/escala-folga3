@@ -12,7 +12,8 @@ export async function listarCargos(): Promise<Cargo[]> {
 async function validar(nome: string, id?: string) {
   const limpo = limparNome(nome);
   if (!limpo) throw new Error("Informe o nome do cargo.");
-  if (nomeDuplicado(limpo, await listarCargos(), id)) throw new Error(`Já existe um cargo chamado "${limpo}".`);
+  if (nomeDuplicado(limpo, await listarCargos(), id))
+    throw new Error(`Já existe um cargo chamado "${limpo}".`);
   return limpo;
 }
 
@@ -21,13 +22,23 @@ export async function salvarCargo(nome: string, cor: string, id?: string) {
   const { error } = id
     ? await supabase.from("cargos").update({ nome: limpo, cor }).eq("id", id)
     : await supabase.from("cargos").insert({ nome: limpo, cor });
-  if (error) throw new Error(error.code === "23505" ? `Já existe um cargo chamado "${limpo}".` : "Não foi possível salvar o cargo.");
+  if (error)
+    throw new Error(
+      error.code === "23505"
+        ? `Já existe um cargo chamado "${limpo}".`
+        : "Não foi possível salvar o cargo.",
+    );
 }
 
 export async function excluirCargo(id: string) {
-  const { count } = await supabase.from("funcionarios").select("id", { count: "exact", head: true }).eq("cargo_id", id);
+  const { count } = await supabase
+    .from("funcionarios")
+    .select("id", { count: "exact", head: true })
+    .eq("cargo_id", id);
   if (count && count > 0)
-    throw new Error(`Este cargo não pode ser excluído: ${count} funcionário${count > 1 ? "s usam" : " usa"} este cargo.`);
+    throw new Error(
+      `Este cargo não pode ser excluído: ${count} funcionário${count > 1 ? "s usam" : " usa"} este cargo.`,
+    );
   const { error } = await supabase.from("cargos").delete().eq("id", id);
   if (error) throw new Error("Não foi possível excluir o cargo.");
 }

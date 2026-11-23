@@ -17,8 +17,13 @@ async function validar(nome: string, sigla: string, id?: string) {
   if (!siglaLimpa) throw new Error("Informe a sigla do tipo de folga.");
 
   const existentes = await listarTiposFolga();
-  if (nomeDuplicado(nomeLimpo, existentes, id)) throw new Error(`Já existe um tipo chamado "${nomeLimpo}".`);
-  if (existentes.some((tipo) => tipo.id !== id && tipo.sigla.trim().toLocaleUpperCase("pt-BR") === siglaLimpa)) {
+  if (nomeDuplicado(nomeLimpo, existentes, id))
+    throw new Error(`Já existe um tipo chamado "${nomeLimpo}".`);
+  if (
+    existentes.some(
+      (tipo) => tipo.id !== id && tipo.sigla.trim().toLocaleUpperCase("pt-BR") === siglaLimpa,
+    )
+  ) {
     throw new Error(`Já existe um tipo com a sigla "${siglaLimpa}".`);
   }
 
@@ -31,9 +36,11 @@ export async function salvarTipoFolga(nome: string, sigla: string, id?: string) 
     ? await supabase.from("tipos_folga").update(dados).eq("id", id)
     : await supabase.from("tipos_folga").insert(dados);
   if (error) {
-    throw new Error(error.code === "23505"
-      ? "Já existe um tipo de folga com esse nome ou sigla."
-      : "Não foi possível salvar o tipo de folga.");
+    throw new Error(
+      error.code === "23505"
+        ? "Já existe um tipo de folga com esse nome ou sigla."
+        : "Não foi possível salvar o tipo de folga.",
+    );
   }
 }
 
@@ -44,13 +51,17 @@ export async function excluirTipoFolga(id: string) {
     .eq("tipo_id", id);
   if (countError) throw new Error("Não foi possível verificar se o tipo de folga está em uso.");
   if (count && count > 0) {
-    throw new Error(`Este tipo não pode ser excluído: ${count} ${count === 1 ? "folga está vinculada a ele." : "folgas estão vinculadas a ele."}`);
+    throw new Error(
+      `Este tipo não pode ser excluído: ${count} ${count === 1 ? "folga está vinculada a ele." : "folgas estão vinculadas a ele."}`,
+    );
   }
 
   const { error } = await supabase.from("tipos_folga").delete().eq("id", id);
   if (error) {
-    throw new Error(error.code === "23503"
-      ? "Este tipo não pode ser excluído porque há folgas vinculadas a ele."
-      : "Não foi possível excluir o tipo de folga.");
+    throw new Error(
+      error.code === "23503"
+        ? "Este tipo não pode ser excluído porque há folgas vinculadas a ele."
+        : "Não foi possível excluir o tipo de folga.",
+    );
   }
 }

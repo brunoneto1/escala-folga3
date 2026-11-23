@@ -2,8 +2,16 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Users, Briefcase, Tag } from "lucide-react";
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu,
-  SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 
 const itens = [
@@ -19,8 +27,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar collapsible="icon" className="border-r border-sidebar-border">
         <SidebarHeader className="px-4 py-5">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary font-extrabold text-sidebar-primary-foreground shadow-sm">F</div>
-            <span className="truncate text-base font-bold tracking-tight group-data-[collapsible=icon]:hidden">Gestor de escala</span>
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary font-extrabold text-sidebar-primary-foreground shadow-sm">
+              F
+            </div>
+            <span className="truncate text-base font-bold tracking-tight group-data-[collapsible=icon]:hidden">
+              Gestor de escala
+            </span>
           </div>
         </SidebarHeader>
         <SidebarContent>
