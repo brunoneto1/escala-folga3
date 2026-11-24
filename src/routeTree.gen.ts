@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as CargosRouteImport } from './routes/cargos'
+import { Route as DomingosRouteImport } from './routes/domingos'
 import { Route as FuncionariosRouteImport } from './routes/funcionarios'
 import { Route as TiposFolgaRouteImport } from './routes/tipos-folga'
 
@@ -30,6 +31,11 @@ const CargosRoute = CargosRouteImport.update({
   path: '/cargos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DomingosRoute = DomingosRouteImport.update({
+  id: '/domingos',
+  path: '/domingos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FuncionariosRoute = FuncionariosRouteImport.update({
   id: '/funcionarios',
   path: '/funcionarios',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/cargos': typeof CargosRoute
+  '/domingos': typeof DomingosRoute
   '/funcionarios': typeof FuncionariosRoute
   '/tipos-folga': typeof TiposFolgaRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/cargos': typeof CargosRoute
+  '/domingos': typeof DomingosRoute
   '/funcionarios': typeof FuncionariosRoute
   '/tipos-folga': typeof TiposFolgaRoute
 }
@@ -60,19 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/cargos': typeof CargosRoute
+  '/domingos': typeof DomingosRoute
   '/funcionarios': typeof FuncionariosRoute
   '/tipos-folga': typeof TiposFolgaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calendario' | '/cargos' | '/funcionarios' | '/tipos-folga'
+  fullPaths:
+    | '/'
+    | '/calendario'
+    | '/cargos'
+    | '/domingos'
+    | '/funcionarios'
+    | '/tipos-folga'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendario' | '/cargos' | '/funcionarios' | '/tipos-folga'
+  to:
+    | '/'
+    | '/calendario'
+    | '/cargos'
+    | '/domingos'
+    | '/funcionarios'
+    | '/tipos-folga'
   id:
     | '__root__'
     | '/'
     | '/calendario'
     | '/cargos'
+    | '/domingos'
     | '/funcionarios'
     | '/tipos-folga'
   fileRoutesById: FileRoutesById
@@ -81,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalendarioRoute: typeof CalendarioRoute
   CargosRoute: typeof CargosRoute
+  DomingosRoute: typeof DomingosRoute
   FuncionariosRoute: typeof FuncionariosRoute
   TiposFolgaRoute: typeof TiposFolgaRoute
 }
@@ -108,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CargosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/domingos': {
+      id: '/domingos'
+      path: '/domingos'
+      fullPath: '/domingos'
+      preLoaderRoute: typeof DomingosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/funcionarios': {
       id: '/funcionarios'
       path: '/funcionarios'
@@ -129,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalendarioRoute: CalendarioRoute,
   CargosRoute: CargosRoute,
+  DomingosRoute: DomingosRoute,
   FuncionariosRoute: FuncionariosRoute,
   TiposFolgaRoute: TiposFolgaRoute,
 }
