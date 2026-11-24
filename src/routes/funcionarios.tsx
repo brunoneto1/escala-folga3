@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TimePicker } from "@/components/ui/time-picker";
 import {
   Select,
   SelectContent,
@@ -310,38 +311,34 @@ function FuncionariosPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="entrada">Entrada</Label>
-                  <Input
+                  <TimePicker
                     id="entrada"
-                    type="time"
                     value={form.entrada}
-                    onChange={(e) => setForm({ ...form, entrada: e.target.value })}
+                    onChange={(entrada) => setForm({ ...form, entrada })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="intervalo_inicio">Início do intervalo</Label>
-                  <Input
+                  <TimePicker
                     id="intervalo_inicio"
-                    type="time"
                     value={form.intervalo_inicio}
-                    onChange={(e) => setForm({ ...form, intervalo_inicio: e.target.value })}
+                    onChange={(intervalo_inicio) => setForm({ ...form, intervalo_inicio })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="intervalo_fim">Fim do intervalo</Label>
-                  <Input
+                  <TimePicker
                     id="intervalo_fim"
-                    type="time"
                     value={form.intervalo_fim}
-                    onChange={(e) => setForm({ ...form, intervalo_fim: e.target.value })}
+                    onChange={(intervalo_fim) => setForm({ ...form, intervalo_fim })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="saida">Saída</Label>
-                  <Input
+                  <TimePicker
                     id="saida"
-                    type="time"
                     value={form.saida}
-                    onChange={(e) => setForm({ ...form, saida: e.target.value })}
+                    onChange={(saida) => setForm({ ...form, saida })}
                   />
                 </div>
               </div>
