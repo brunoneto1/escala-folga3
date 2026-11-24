@@ -1,15 +1,15 @@
 import { n as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { I as require_jsx_runtime } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
-import { n as Input, t as Button } from "./input-BTXCllkk.mjs";
+import { n as Input, t as Button } from "./input-2NYfids5.mjs";
 import { d as ChevronRight, f as ChevronLeft, i as Trash2, o as Search, r as TriangleAlert, s as Plus } from "../_libs/lucide-react.mjs";
-import { a as AlertDialogDescription, c as AlertDialogTitle, f as DialogHeader, g as PageHeader, i as AlertDialogContent, l as Dialog, m as Label, n as AlertDialogAction, o as AlertDialogFooter, p as DialogTitle, r as AlertDialogCancel, s as AlertDialogHeader, t as AlertDialog, u as DialogContent } from "./nomes-zltfDt9_.mjs";
+import { a as AlertDialogDescription, c as AlertDialogTitle, f as DialogHeader, i as AlertDialogContent, l as Dialog, m as Label, n as AlertDialogAction, o as AlertDialogFooter, p as DialogTitle, r as AlertDialogCancel, s as AlertDialogHeader, t as AlertDialog, u as DialogContent } from "./nomes-BOIzUybv.mjs";
 import { t as supabase } from "./client-CPmvs8V5.mjs";
-import { i as listarFuncionarios, r as listarCargos, s as textoSobreCor } from "./cores-C6rzIDTZ.mjs";
-import { n as listarTiposFolga } from "./tiposFolga-CFZa3EzW.mjs";
+import { a as formatarJornadaCompacta, c as normalizarHora, d as textoSobreCor, i as formatarDuracao, o as listarCargos, s as listarFuncionarios, t as cargaDiariaMinutos } from "./cores-KjMaiK8e.mjs";
+import { n as listarTiposFolga } from "./tiposFolga-C4I1QWjk.mjs";
 import { i as useQueryClient, n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/calendario-BnG4r-Pz.js
+//#region node_modules/.nitro/vite/services/ssr/assets/calendario-D4Y_cm3L.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 async function listarFolgas() {
@@ -114,6 +114,16 @@ var SEMANA = [
 var pad = (n) => String(n).padStart(2, "0");
 var iso = (a, m, d) => `${a}-${pad(m + 1)}-${pad(d)}`;
 var CHAVE = "escala-config";
+var LARGURA_COLUNA_NOMES = "14rem";
+function resumoJornada(jornada) {
+	const partes = [];
+	if (jornada.entrada) partes.push(`Entrada ${jornada.entrada}`);
+	if (jornada.saida) partes.push(`Saída ${jornada.saida}`);
+	if (jornada.intervalo_inicio && jornada.intervalo_fim) partes.push(`Intervalo ${jornada.intervalo_inicio}–${jornada.intervalo_fim}`);
+	const carga = cargaDiariaMinutos(jornada);
+	if (carga !== null) partes.push(`Carga ${formatarDuracao(carga)}`);
+	return partes.length > 0 ? partes.join(" · ") : "—";
+}
 function CalendarioPage() {
 	const qc = useQueryClient();
 	const { data: funcionarios = [] } = useQuery({
@@ -138,6 +148,8 @@ function CalendarioPage() {
 		m: hoje.getMonth()
 	});
 	const [visao, setVisao] = (0, import_react.useState)("calendario");
+	const [mostrarCobertura, setMostrarCobertura] = (0, import_react.useState)(false);
+	const [mostrarJornada, setMostrarJornada] = (0, import_react.useState)(false);
 	const [config, setConfig] = (0, import_react.useState)(CONFIG_PADRAO);
 	const [dia, setDia] = (0, import_react.useState)(null);
 	const [funcionarioPendenteId, setFuncionarioPendenteId] = (0, import_react.useState)(null);
@@ -252,46 +264,29 @@ function CalendarioPage() {
 		});
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "mx-auto max-w-6xl",
+		className: `mx-auto w-full ${visao === "tabela" ? "calendar-table-view flex min-h-0 flex-1 flex-col max-w-none" : "max-w-6xl"}`,
 		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PageHeader, {
-				title: "Calendário",
-				subtitle: "Consulte a escala do mês e marque ou remova folgas.",
-				action: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					role: "group",
-					"aria-label": "Visão da escala",
-					className: "flex items-center gap-1 rounded-lg border bg-card p-1",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-						type: "button",
-						size: "sm",
-						variant: visao === "calendario" ? "secondary" : "ghost",
-						"aria-pressed": visao === "calendario",
-						onClick: () => setVisao("calendario"),
-						children: "Calendário"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-						type: "button",
-						size: "sm",
-						variant: visao === "tabela" ? "secondary" : "ghost",
-						"aria-pressed": visao === "tabela",
-						onClick: () => setVisao("tabela"),
-						children: "Tabela"
-					})]
-				})
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+				className: "sr-only",
+				children: "Calendário"
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "mb-4 flex flex-wrap items-end justify-between gap-4 rounded-xl border bg-card p-4 shadow-sm",
+				className: "mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl border border-border/70 bg-card px-3 py-2 shadow-sm lg:flex-nowrap",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex items-center gap-2",
+					className: "flex min-w-0 flex-wrap items-center gap-1",
 					children: [
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 							variant: "outline",
 							size: "icon",
+							className: "size-8 shrink-0",
 							"aria-label": "Mês anterior",
 							onClick: () => andar(-1),
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, {})
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 							variant: "outline",
+							size: "sm",
+							className: "h-8 shrink-0",
 							onClick: () => setMes({
 								a: hoje.getFullYear(),
 								m: hoje.getMonth()
@@ -301,54 +296,96 @@ function CalendarioPage() {
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
 							variant: "outline",
 							size: "icon",
+							className: "size-8 shrink-0",
 							"aria-label": "Próximo mês",
 							onClick: () => andar(1),
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, {})
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-							className: "ml-2 text-lg font-bold capitalize",
+							className: "ml-1 whitespace-nowrap px-1 text-base font-bold capitalize",
 							children: titulo
 						})
 					]
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex gap-4",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-1",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-							htmlFor: "lim",
-							children: "Máx. por cargo/dia"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-							id: "lim",
-							type: "number",
-							min: 1,
-							className: "w-28",
-							value: config.limitePorCargoDia,
-							onChange: (e) => mudarConfig({
-								...config,
-								limitePorCargoDia: Math.max(1, Number(e.target.value) || 1)
-							})
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "space-y-1",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-							htmlFor: "max",
-							children: "Máx. folgas/mês"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-							id: "max",
-							type: "number",
-							min: 1,
-							className: "w-28",
-							value: config.maxFolgasMes,
-							onChange: (e) => mudarConfig({
-								...config,
-								maxFolgasMes: Math.max(1, Number(e.target.value) || 1)
-							})
-						})]
-					})]
+					className: "flex flex-wrap items-center gap-x-4 gap-y-2 lg:flex-nowrap",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+								htmlFor: "lim",
+								className: "whitespace-nowrap text-xs",
+								children: "Máx. por cargo/dia"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								id: "lim",
+								type: "number",
+								min: 1,
+								className: "h-8 w-16 px-2 text-sm",
+								value: config.limitePorCargoDia,
+								onChange: (e) => mudarConfig({
+									...config,
+									limitePorCargoDia: Math.max(1, Number(e.target.value) || 1)
+								})
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+								htmlFor: "max",
+								className: "whitespace-nowrap text-xs",
+								children: "Máx. folgas/mês"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+								id: "max",
+								type: "number",
+								min: 1,
+								className: "h-8 w-16 px-2 text-sm",
+								value: config.maxFolgasMes,
+								onChange: (e) => mudarConfig({
+									...config,
+									maxFolgasMes: Math.max(1, Number(e.target.value) || 1)
+								})
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							role: "group",
+							"aria-label": "Visão da escala",
+							className: "flex items-center gap-1 rounded-lg border bg-card p-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								type: "button",
+								size: "sm",
+								variant: visao === "calendario" ? "secondary" : "ghost",
+								"aria-pressed": visao === "calendario",
+								onClick: () => setVisao("calendario"),
+								children: "Calendário"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								type: "button",
+								size: "sm",
+								variant: visao === "tabela" ? "secondary" : "ghost",
+								"aria-pressed": visao === "tabela",
+								onClick: () => setVisao("tabela"),
+								children: "Tabela"
+							})]
+						}),
+						visao === "tabela" && funcionarios.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							type: "button",
+							size: "sm",
+							variant: "outline",
+							"aria-expanded": mostrarCobertura,
+							"aria-controls": "cobertura-escala",
+							onClick: () => setMostrarCobertura((mostrar) => !mostrar),
+							children: mostrarCobertura ? "Ocultar cobertura" : "Mostrar cobertura"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							type: "button",
+							size: "sm",
+							variant: "outline",
+							"aria-pressed": mostrarJornada,
+							onClick: () => setMostrarJornada((mostrar) => !mostrar),
+							children: mostrarJornada ? "Ocultar jornada" : "Mostrar jornada"
+						})] })
+					]
 				})]
 			}),
 			visao === "calendario" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "hidden grid-cols-7 gap-px overflow-hidden rounded-xl border bg-border shadow-sm md:grid",
+				className: "hidden grid-cols-7 gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/70 shadow-sm md:grid",
 				children: [SEMANA.map((s) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "bg-muted px-2 py-2 text-center text-xs font-bold uppercase text-muted-foreground",
 					children: s
@@ -376,9 +413,11 @@ function CalendarioPage() {
 				funcionarios,
 				folgas,
 				hoje: hojeIso,
+				mostrarCobertura,
+				mostrarJornada,
 				onCellClick: abrirDia
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LegendaCargos, {
+			visao === "calendario" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LegendaCargos, {
 				cargos,
 				tipos: tiposFolga
 			}),
@@ -399,11 +438,15 @@ function CalendarioPage() {
 						className: "min-w-0 shrink-0 gap-3 pr-8",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogTitle, {
 							className: "min-w-0 break-words",
-							children: ["Folgas de ", dia && (/* @__PURE__ */ new Date(`${dia}T12:00`)).toLocaleDateString("pt-BR", {
-								weekday: "long",
-								day: "numeric",
-								month: "long"
-							})]
+							children: [
+								"Folgas de",
+								" ",
+								dia && (/* @__PURE__ */ new Date(`${dia}T12:00`)).toLocaleDateString("pt-BR", {
+									weekday: "long",
+									day: "numeric",
+									month: "long"
+								})
+							]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "grid min-w-0 gap-3 md:grid-cols-[auto_minmax(0,1fr)] md:items-end",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
@@ -530,6 +573,14 @@ function CalendarioPage() {
 		]
 	});
 }
+function jornadaDoFuncionario(funcionario) {
+	return {
+		entrada: normalizarHora(funcionario.entrada),
+		saida: normalizarHora(funcionario.saida),
+		intervalo_inicio: normalizarHora(funcionario.intervalo_inicio),
+		intervalo_fim: normalizarHora(funcionario.intervalo_fim)
+	};
+}
 function agruparFuncionarios(funcionarios) {
 	const porCargo = /* @__PURE__ */ new Map();
 	funcionarios.forEach((funcionario) => {
@@ -620,7 +671,7 @@ function SecaoFolgasDia({ titulo, tipo, grupos, contagem, folgaPorFuncionario, t
 											className: `flex w-full min-w-0 justify-center overflow-hidden rounded-md border border-dashed px-2.5 py-1.5 text-xs font-semibold leading-none ${folga.tipo?.sigla ? "text-foreground" : "text-muted-foreground"}`,
 											children: folga.tipo?.sigla ?? "+ tipo"
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
-											className: "absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed",
+											className: "absolute inset-0 h-full w-full cursor-pointer bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground opacity-0 disabled:cursor-not-allowed",
 											value: folga.tipo_id ?? "",
 											"aria-label": `Trocar tipo da folga de ${funcionario.nome}`,
 											title: folga.tipo ? `Tipo atual: ${folga.tipo.nome}` : "Adicionar tipo à folga",
@@ -657,8 +708,10 @@ function SecaoFolgasDia({ titulo, tipo, grupos, contagem, folgaPorFuncionario, t
 		})]
 	});
 }
-function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }) {
+function TabelaEscala({ mes, funcionarios, folgas, hoje, mostrarCobertura, mostrarJornada, onCellClick }) {
 	const grupos = (0, import_react.useMemo)(() => agruparFuncionarios(funcionarios), [funcionarios]);
+	const [cargosOcultos, setCargosOcultos] = (0, import_react.useState)(() => /* @__PURE__ */ new Set());
+	const gruposVisiveis = (0, import_react.useMemo)(() => grupos.filter((grupo) => !cargosOcultos.has(grupo.id)), [cargosOcultos, grupos]);
 	const dias = Array.from({ length: new Date(mes.a, mes.m + 1, 0).getDate() }, (_, i) => i + 1);
 	const folgasPorCelula = (0, import_react.useMemo)(() => {
 		const porCelula = /* @__PURE__ */ new Map();
@@ -674,130 +727,216 @@ function TabelaEscala({ mes, funcionarios, folgas, hoje, onCellClick }) {
 		});
 		return porDia;
 	}, [folgas]);
-	if (funcionarios.length === 0) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: "rounded-xl border bg-card px-4 py-10 text-center text-sm text-muted-foreground",
-		children: "Cadastre funcionários para montar a escala."
-	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: "max-h-[70vh] overflow-auto rounded-xl border bg-card shadow-sm",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", {
-			className: "w-max min-w-full border-separate border-spacing-0 text-sm",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("caption", {
-					className: "sr-only",
-					children: "Escala mensal de folgas por funcionário e cargo"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
-					scope: "col",
-					className: "sticky left-0 top-0 z-40 min-w-56 border-b border-r bg-muted px-3 py-2 text-left font-semibold",
-					children: "Funcionário / cargo"
-				}), dias.map((numero) => {
-					const data = iso(mes.a, mes.m, numero);
-					const semana = SEMANA[(/* @__PURE__ */ new Date(`${data}T12:00`)).getDay()];
-					return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
-						scope: "col",
-						className: `sticky top-0 z-30 w-12 min-w-12 border-b border-r px-1 py-1 text-center ${data === hoje ? "bg-primary/10" : "bg-muted"}`,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-							type: "button",
-							className: "flex w-full flex-col items-center rounded px-1 py-1 hover:bg-accent",
-							"aria-label": `Abrir folgas de ${(/* @__PURE__ */ new Date(`${data}T12:00`)).toLocaleDateString("pt-BR", {
-								weekday: "long",
-								day: "numeric",
-								month: "long"
-							})}`,
-							onClick: () => onCellClick(data),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "font-semibold",
-								children: numero
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "text-[10px] font-normal uppercase text-muted-foreground",
-								children: semana
-							})]
+		className: "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border",
+		children: funcionarios.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "px-4 py-10 text-center text-sm text-muted-foreground",
+			children: "Cadastre funcionários para montar a escala."
+		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex min-h-9 flex-wrap gap-1.5 border-b px-3 py-1",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+				type: "button",
+				"aria-pressed": cargosOcultos.size === 0,
+				"aria-label": "Mostrar todos os cargos",
+				className: `h-7 rounded-full px-3 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${cargosOcultos.size === 0 ? "bg-muted text-foreground" : "border border-border bg-transparent text-muted-foreground"}`,
+				onClick: () => setCargosOcultos(/* @__PURE__ */ new Set()),
+				children: "Todos"
+			}), grupos.map((grupo) => {
+				const visivel = !cargosOcultos.has(grupo.id);
+				return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+					type: "button",
+					"aria-pressed": visivel,
+					"aria-label": `Mostrar cargo ${grupo.nome}`,
+					className: `h-7 rounded-full px-3 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${visivel ? "" : "border border-border bg-transparent text-muted-foreground"}`,
+					style: visivel && grupo.cor ? {
+						backgroundColor: grupo.cor,
+						color: textoSobreCor(grupo.cor)
+					} : void 0,
+					onClick: () => setCargosOcultos((atuais) => {
+						const proximos = new Set(atuais);
+						if (proximos.has(grupo.id)) proximos.delete(grupo.id);
+						else proximos.add(grupo.id);
+						return proximos;
+					}),
+					children: [!visivel && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "mr-1.5 inline-block size-2 rounded-sm align-middle",
+						style: grupo.cor ? { backgroundColor: grupo.cor } : void 0
+					}), grupo.nome]
+				}, grupo.id);
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "min-h-0 min-w-0 flex-1 overflow-auto",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", {
+				className: "w-full border-collapse text-sm",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("caption", {
+						className: "sr-only",
+						children: "Escala mensal de folgas por funcionário e cargo"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+							scope: "col",
+							className: "sticky left-0 top-0 z-40 h-7 w-56 min-w-56 max-w-56 border-b border-border bg-muted/50 px-2 py-0 text-left text-xs font-bold text-muted-foreground shadow-[1px_0_0_var(--border)]",
+							children: "Funcionário / cargo"
+						}),
+						mostrarJornada && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+							scope: "col",
+							style: { left: LARGURA_COLUNA_NOMES },
+							className: "sticky top-0 z-40 h-7 w-44 min-w-44 max-w-44 border-b border-border bg-muted/50 px-2 py-0 text-left text-xs font-bold text-muted-foreground shadow-[1px_0_0_var(--border)]",
+							children: "Jornada"
+						}),
+						dias.map((numero) => {
+							const data = iso(mes.a, mes.m, numero);
+							const diaSemana = (/* @__PURE__ */ new Date(`${data}T12:00`)).getDay();
+							const semana = SEMANA[diaSemana];
+							const domingo = diaSemana === 0;
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+								scope: "col",
+								className: `sticky top-0 z-30 h-7 min-w-8 border-b border-border px-1 py-0 text-center text-xs font-bold text-muted-foreground ${domingo || data === hoje ? "bg-primary/10 text-foreground" : "bg-muted/50"} ${domingo || data === hoje ? "border-t-[3px] border-t-[#ea6109]" : ""} ${domingo ? "ring-2 ring-inset ring-primary" : ""} ${domingo && numero !== 1 ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`,
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+									type: "button",
+									className: `flex w-full flex-col items-center rounded px-1 py-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${domingo ? "hover:bg-black/10" : "hover:bg-accent"}`,
+									"aria-label": `Abrir folgas de ${(/* @__PURE__ */ new Date(`${data}T12:00`)).toLocaleDateString("pt-BR", {
+										weekday: "long",
+										day: "numeric",
+										month: "long"
+									})}`,
+									onClick: () => onCellClick(data),
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: `text-xs ${data === hoje ? "text-primary" : "text-foreground"}`,
+										children: numero
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: data === hoje ? "text-[10px] font-extrabold uppercase tracking-[0.12em] text-primary" : "text-[10px] font-bold uppercase text-muted-foreground",
+										children: data === hoje ? "HOJE" : semana
+									})]
+								})
+							}, data);
 						})
-					}, data);
-				})] }) }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: grupos.map((grupo) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_react.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("th", {
-					scope: "rowgroup",
-					colSpan: dias.length + 1,
-					className: "border-b border-t bg-muted/60 px-3 py-2 text-left",
-					children: [grupo.cor ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						className: "rounded-md px-2 py-1 text-xs font-semibold",
-						style: {
-							backgroundColor: grupo.cor,
-							color: textoSobreCor(grupo.cor)
-						},
-						children: grupo.nome
-					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						className: "font-semibold",
-						children: grupo.nome
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-						className: "ml-2 text-xs font-normal text-muted-foreground",
-						children: [
-							grupo.funcionarios.length,
-							" ",
-							grupo.funcionarios.length === 1 ? "funcionário" : "funcionários"
-						]
-					})]
-				}) }), grupo.funcionarios.map((funcionario) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
-					className: "hover:bg-muted/20",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
-						scope: "row",
-						className: "sticky left-0 z-20 min-w-56 border-b border-r bg-card px-3 py-1.5 text-left font-medium",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "block min-w-0 [overflow-wrap:anywhere]",
-							children: funcionario.nome
-						})
-					}), dias.map((numero) => {
-						const data = iso(mes.a, mes.m, numero);
-						const folga = folgasPorCelula.get(`${funcionario.id}:${data}`);
-						const nomeData = (/* @__PURE__ */ new Date(`${data}T12:00`)).toLocaleDateString("pt-BR", {
-							weekday: "long",
-							day: "numeric",
-							month: "long"
-						});
-						return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
-							className: "w-12 min-w-12 border-b border-r p-1 text-center",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-								type: "button",
-								className: `h-8 w-full rounded transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${folga ? grupo.cor ? "font-semibold" : "bg-muted font-semibold" : "hover:bg-accent"}`,
-								style: folga && grupo.cor ? {
+					] }) }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
+						className: "[&_tr:last-child_th]:border-b-0 [&_tr:last-child_td]:border-b-0",
+						children: gruposVisiveis.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", {
+							colSpan: dias.length + 1 + Number(mostrarJornada),
+							className: "px-4 py-6 text-center text-sm text-muted-foreground",
+							children: [
+								"Nenhum cargo selecionado.",
+								" ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+									type: "button",
+									className: "font-semibold text-foreground underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+									onClick: () => setCargosOcultos(/* @__PURE__ */ new Set()),
+									children: "Todos"
+								})
+							]
+						}) }) : gruposVisiveis.map((grupo) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_react.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("th", {
+							scope: "rowgroup",
+							className: "sticky left-0 z-20 h-[22px] w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-3 py-0.5 text-left shadow-[1px_0_0_var(--border)]",
+							children: [grupo.cor ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "rounded-md px-2 py-0 leading-5 text-xs font-semibold",
+								style: {
 									backgroundColor: grupo.cor,
 									color: textoSobreCor(grupo.cor)
-								} : void 0,
-								"aria-label": folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`,
-								title: folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`,
-								onClick: () => onCellClick(data),
-								children: folga ? folga.tipo?.sigla ?? "F" : null
-							})
-						}, data);
-					})]
-				}, funcionario.id))] }, grupo.id)) }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tfoot", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
-					colSpan: dias.length + 1,
-					className: "border-t bg-muted px-3 py-2 text-left text-xs font-bold uppercase text-muted-foreground",
-					children: "Cobertura por cargo — pessoas trabalhando"
-				}) }), grupos.map((grupo) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
-					className: "bg-muted/60 font-semibold",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
-						scope: "row",
-						className: "sticky left-0 z-20 min-w-56 border-b border-r border-t bg-muted px-3 py-2 text-left",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "block min-w-0 truncate",
-							children: grupo.nome
-						})
-					}), dias.map((numero) => {
-						const data = iso(mes.a, mes.m, numero);
-						const ausentes = ausentesPorDia.get(data);
-						const cobertura = grupo.funcionarios.reduce((total, funcionario) => total + (ausentes?.has(funcionario.id) ? 0 : 1), 0);
-						return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
-							title: `${cobertura} de ${grupo.funcionarios.length} trabalhando`,
-							className: "w-12 min-w-12 border-b border-r border-t bg-muted px-1 py-2 text-center",
-							children: cobertura
-						}, data);
-					})]
-				}, grupo.id))] })
-			]
-		})
+								},
+								children: grupo.nome
+							}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "font-semibold",
+								children: grupo.nome
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "ml-2 text-[11px] font-normal text-muted-foreground",
+								children: [
+									grupo.funcionarios.length,
+									" ",
+									grupo.funcionarios.length === 1 ? "funcionário" : "funcionários"
+								]
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+							colSpan: dias.length + Number(mostrarJornada),
+							className: "border-b border-border/60 border-t border-border/60 bg-muted/40"
+						})] }), grupo.funcionarios.map((funcionario) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+							className: "hover:bg-muted/20",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+									scope: "row",
+									className: "sticky left-0 z-20 h-6 w-56 min-w-56 max-w-56 border-b border-border/60 bg-muted/50 px-2 py-0 text-left text-xs leading-4 font-medium shadow-[1px_0_0_var(--border)]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "block min-w-0 truncate",
+										title: resumoJornada(jornadaDoFuncionario(funcionario)),
+										children: funcionario.nome
+									})
+								}),
+								mostrarJornada && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+									style: { left: LARGURA_COLUNA_NOMES },
+									title: resumoJornada(jornadaDoFuncionario(funcionario)),
+									className: "sticky z-20 h-6 w-44 min-w-44 max-w-44 truncate border-b border-border/60 bg-muted/50 px-2 py-0 text-[11px] tabular-nums text-muted-foreground whitespace-nowrap shadow-[1px_0_0_var(--border)]",
+									children: formatarJornadaCompacta(jornadaDoFuncionario(funcionario))
+								}),
+								dias.map((numero) => {
+									const data = iso(mes.a, mes.m, numero);
+									const domingo = (/* @__PURE__ */ new Date(`${data}T12:00`)).getDay() === 0;
+									const inicioSemana = domingo && numero !== 1;
+									const folga = folgasPorCelula.get(`${funcionario.id}:${data}`);
+									const nomeData = (/* @__PURE__ */ new Date(`${data}T12:00`)).toLocaleDateString("pt-BR", {
+										weekday: "long",
+										day: "numeric",
+										month: "long"
+									});
+									return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+										className: `h-6 min-w-8 border-b border-border/60 p-0 text-center ${domingo && !folga ? "bg-primary/5" : data === hoje && !folga ? "bg-primary/5" : ""} ${domingo ? "border-t-[3px] border-t-[#ea6109] ring-2 ring-inset ring-primary" : ""} ${folga && !grupo.cor ? "bg-muted" : ""} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`,
+										style: folga && grupo.cor ? { backgroundColor: grupo.cor } : void 0,
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+											type: "button",
+											className: `h-6 w-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${folga ? "block rounded-none bg-transparent text-center text-[11px] font-semibold" : "hover:bg-accent/60"}`,
+											style: folga && grupo.cor ? { color: textoSobreCor(grupo.cor) } : void 0,
+											"aria-label": folga ? `${funcionario.nome} está de folga em ${nomeData}${folga.tipo?.sigla ? `, tipo ${folga.tipo.sigla}` : ""}` : `Marcar folga para ${funcionario.nome} em ${nomeData}`,
+											title: folga ? `${folga.tipo?.nome ?? "Folga comum"} — ${nomeData}` : `Marcar folga — ${nomeData}`,
+											onClick: () => onCellClick(data),
+											children: folga ? folga.tipo?.sigla ?? "F" : null
+										})
+									}, data);
+								})
+							]
+						}, funcionario.id))] }, grupo.id))
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tfoot", {
+						id: "cobertura-escala",
+						hidden: !mostrarCobertura,
+						className: "[&_tr:last-child_th]:border-b-0 [&_tr:last-child_td]:border-b-0",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("th", {
+							className: "sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-2 py-1 text-left text-xs font-bold uppercase text-muted-foreground shadow-[1px_0_0_var(--border)]",
+							children: [" ", "Funcionários trabalhando"]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+							colSpan: dias.length + Number(mostrarJornada),
+							className: "border-b border-border/60 border-t border-border/60 bg-muted/40"
+						})] }), gruposVisiveis.map((grupo) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", {
+							className: "bg-muted/60 font-semibold",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
+									scope: "row",
+									className: "sticky left-0 z-20 w-56 min-w-56 max-w-56 border-b border-border/60 border-t border-border/60 bg-muted/40 px-2 py-0.5 text-left text-xs shadow-[1px_0_0_var(--border)]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "block min-w-0 truncate",
+										children: grupo.nome
+									})
+								}),
+								mostrarJornada && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { className: "border-b border-border/60 border-t border-border/60 bg-muted/40" }),
+								dias.map((numero) => {
+									const data = iso(mes.a, mes.m, numero);
+									const domingo = (/* @__PURE__ */ new Date(`${data}T12:00`)).getDay() === 0;
+									const inicioSemana = domingo && numero !== 1;
+									const ausentes = ausentesPorDia.get(data);
+									const cobertura = grupo.funcionarios.reduce((total, funcionario) => total + (ausentes?.has(funcionario.id) ? 0 : 1), 0);
+									return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+										title: `${cobertura} de ${grupo.funcionarios.length} trabalhando`,
+										className: `min-w-8 border-b border-border/60 border-t border-border/60 px-0.5 py-1 text-center text-xs ${domingo ? "bg-primary/5 border-t-[3px] border-t-[#ea6109] ring-2 ring-inset ring-primary" : "bg-muted/40"} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`,
+										children: cobertura
+									}, data);
+								})
+							]
+						}, grupo.id))]
+					})
+				]
+			})
+		})] })
 	});
 }
 function LegendaCargos({ cargos, tipos }) {

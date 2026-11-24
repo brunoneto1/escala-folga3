@@ -1,14 +1,15 @@
 import { n as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { I as require_jsx_runtime } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
-import { n as Input, t as Button } from "./input-BTXCllkk.mjs";
+import { n as Input, t as Button } from "./input-2NYfids5.mjs";
 import { c as Pencil, i as Trash2, m as Check, s as Plus } from "../_libs/lucide-react.mjs";
-import { d as DialogFooter, f as DialogHeader, g as PageHeader, h as PALETA, l as Dialog, m as Label, p as DialogTitle, u as DialogContent, y as sugerirCor } from "./nomes-zltfDt9_.mjs";
-import { a as salvarCargo, i as listarFuncionarios, r as listarCargos, s as textoSobreCor, t as excluirCargo } from "./cores-C6rzIDTZ.mjs";
+import { d as DialogFooter, f as DialogHeader, h as PALETA, l as Dialog, m as Label, p as DialogTitle, u as DialogContent, v as sugerirCor } from "./nomes-BOIzUybv.mjs";
+import { d as textoSobreCor, l as salvarCargo, n as excluirCargo, o as listarCargos, s as listarFuncionarios } from "./cores-KjMaiK8e.mjs";
 import { i as useQueryClient, n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-import { a as TableHead, i as TableCell, n as Table, o as TableHeader, r as TableBody, s as TableRow, t as ConfirmDialog } from "./ConfirmDialog-vgkDbybm.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/cargos-WCeLOxVC.js
+import { a as TableHead, i as TableCell, n as Table, o as TableHeader, r as TableBody, s as TableRow, t as ConfirmDialog } from "./ConfirmDialog-jCJOZO9Q.mjs";
+import { t as PageHeader } from "./PageHeader-3NKeHZ1q.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/cargos-wVDSINnV.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function CargosPage() {
@@ -62,7 +63,7 @@ function CargosPage() {
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "rounded-xl border bg-card shadow-sm",
+				className: "overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
 						className: "w-48 min-w-48",

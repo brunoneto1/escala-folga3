@@ -1,14 +1,15 @@
 import { n as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { I as require_jsx_runtime } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
-import { n as Input, t as Button } from "./input-BTXCllkk.mjs";
+import { n as Input, t as Button } from "./input-2NYfids5.mjs";
 import { c as Pencil, i as Trash2, s as Plus } from "../_libs/lucide-react.mjs";
-import { d as DialogFooter, f as DialogHeader, g as PageHeader, l as Dialog, m as Label, p as DialogTitle, u as DialogContent } from "./nomes-zltfDt9_.mjs";
-import { n as listarTiposFolga, r as salvarTipoFolga, t as excluirTipoFolga } from "./tiposFolga-CFZa3EzW.mjs";
+import { d as DialogFooter, f as DialogHeader, l as Dialog, m as Label, p as DialogTitle, u as DialogContent } from "./nomes-BOIzUybv.mjs";
+import { n as listarTiposFolga, r as salvarTipoFolga, t as excluirTipoFolga } from "./tiposFolga-C4I1QWjk.mjs";
 import { i as useQueryClient, n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-import { a as TableHead, i as TableCell, n as Table, o as TableHeader, r as TableBody, s as TableRow, t as ConfirmDialog } from "./ConfirmDialog-vgkDbybm.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/tipos-folga-B5cpQhEp.js
+import { a as TableHead, i as TableCell, n as Table, o as TableHeader, r as TableBody, s as TableRow, t as ConfirmDialog } from "./ConfirmDialog-jCJOZO9Q.mjs";
+import { t as PageHeader } from "./PageHeader-3NKeHZ1q.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/tipos-folga-BZGP0yLr.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function TiposFolgaPage() {
@@ -57,7 +58,7 @@ function TiposFolgaPage() {
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "rounded-xl border bg-card shadow-sm",
+				className: "overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Nome" }),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Sigla" }),

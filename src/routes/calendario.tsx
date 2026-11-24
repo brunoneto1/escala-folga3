@@ -816,7 +816,7 @@ function TabelaEscala({
                       <th
                         key={data}
                         scope="col"
-                        className={`sticky top-0 z-30 h-7 min-w-8 border-b border-border px-1 py-0 text-center text-xs font-bold text-muted-foreground ${domingo ? "bg-[#dea12f] text-foreground" : data === hoje ? "bg-primary/10" : "bg-muted/50"} ${data === hoje ? "border-t-[3px] border-t-[#ea6109]" : ""} ${data === hoje && domingo ? "ring-2 ring-inset ring-primary" : ""} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}
+                        className={`sticky top-0 z-30 h-7 min-w-8 border-b border-border px-1 py-0 text-center text-xs font-bold text-muted-foreground ${domingo || data === hoje ? "bg-primary/10 text-foreground" : "bg-muted/50"} ${domingo || data === hoje ? "border-t-[3px] border-t-[#ea6109]" : ""} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}
                       >
                         <button
                           type="button"
@@ -927,7 +927,7 @@ function TabelaEscala({
                             return (
                               <td
                                 key={data}
-                                className={`h-6 min-w-8 border-b border-border/60 p-0 text-center ${domingo && !folga ? "bg-[#dea12f]/25" : data === hoje && !folga ? "bg-primary/5" : ""} ${folga && !grupo.cor ? "bg-muted" : ""} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}
+                                className={`h-6 min-w-8 border-b border-border/60 p-0 text-center ${domingo && !folga ? "bg-primary/5" : data === hoje && !folga ? "bg-primary/5" : ""} ${domingo ? "border-t-[3px] border-t-[#ea6109]" : ""} ${folga && !grupo.cor ? "bg-muted" : ""} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}
                                 style={
                                   folga && grupo.cor ? { backgroundColor: grupo.cor } : undefined
                                 }
@@ -1002,7 +1002,7 @@ function TabelaEscala({
                         <td
                           key={data}
                           title={`${cobertura} de ${grupo.funcionarios.length} trabalhando`}
-                          className={`min-w-8 border-b border-border/60 border-t border-border/60 px-0.5 py-1 text-center text-xs ${domingo ? "bg-[#dea12f]/25" : "bg-muted/40"} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}
+                          className={`min-w-8 border-b border-border/60 border-t border-border/60 px-0.5 py-1 text-center text-xs ${domingo ? "bg-primary/5 border-t-[3px] border-t-[#ea6109]" : "bg-muted/40"} ${inicioSemana ? "border-l border-l-border/70" : ""} ${numero === dias.length ? "border-r-0" : "border-r border-border/35"}`}
                         >
                           {cobertura}
                         </td>

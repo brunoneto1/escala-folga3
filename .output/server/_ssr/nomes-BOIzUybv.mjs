@@ -2,10 +2,10 @@ import { n as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { I as require_jsx_runtime, a as AlertDialogDescription$1, c as AlertDialogTitle$1, d as DialogContent$1, f as DialogDescription$1, h as DialogTitle$1, i as AlertDialogContent$1, l as Dialog$1, m as DialogPortal$1, n as AlertDialogAction$1, o as AlertDialogOverlay$1, p as DialogOverlay$1, r as AlertDialogCancel$1, s as AlertDialogPortal$1, t as AlertDialog$1, u as DialogClose } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
-import { i as cn, r as buttonVariants } from "./input-BTXCllkk.mjs";
+import { i as cn, r as buttonVariants } from "./input-2NYfids5.mjs";
 import { t as X } from "../_libs/lucide-react.mjs";
 import { t as Label$1 } from "../_libs/radix-ui__react-label.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/nomes-zltfDt9_.js
+//#region node_modules/.nitro/vite/services/ssr/assets/nomes-BOIzUybv.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var labelVariants = cva("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70");
@@ -25,7 +25,7 @@ var DialogOverlay = import_react.forwardRef(({ className, ...props }, ref) => /*
 DialogOverlay.displayName = DialogOverlay$1.displayName;
 var DialogContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent$1, {
 	ref,
-	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg", className),
+	className: cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border-border bg-card p-6 shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-2xl", className),
 	...props,
 	children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogClose, {
 		className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background cursor-pointer transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
@@ -106,18 +106,6 @@ var AlertDialogCancel = import_react.forwardRef(({ className, ...props }, ref) =
 	...props
 }));
 AlertDialogCancel.displayName = AlertDialogCancel$1.displayName;
-function PageHeader({ title, subtitle, action }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "mb-6 flex flex-wrap items-end justify-between gap-4",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
-			className: "text-2xl font-extrabold tracking-tight",
-			children: title
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-			className: "text-sm text-muted-foreground",
-			children: subtitle
-		})] }), action]
-	});
-}
 function normalizarNome(nome) {
 	return nome.trim().replace(/\s+/g, " ").toLocaleLowerCase("pt-BR");
 }
@@ -146,4 +134,4 @@ function sugerirCor(usadas) {
 	return PALETA.find((c) => !usadas.includes(c)) ?? PALETA[usadas.length % PALETA.length] ?? PALETA[0];
 }
 //#endregion
-export { limparNome as _, AlertDialogDescription as a, AlertDialogTitle as c, DialogFooter as d, DialogHeader as f, PageHeader as g, PALETA as h, AlertDialogContent as i, Dialog as l, Label as m, AlertDialogAction as n, AlertDialogFooter as o, DialogTitle as p, AlertDialogCancel as r, AlertDialogHeader as s, AlertDialog as t, DialogContent as u, nomeDuplicado as v, sugerirCor as y };
+export { nomeDuplicado as _, AlertDialogDescription as a, AlertDialogTitle as c, DialogFooter as d, DialogHeader as f, limparNome as g, PALETA as h, AlertDialogContent as i, Dialog as l, Label as m, AlertDialogAction as n, AlertDialogFooter as o, DialogTitle as p, AlertDialogCancel as r, AlertDialogHeader as s, AlertDialog as t, DialogContent as u, sugerirCor as v };

@@ -1,9 +1,9 @@
 import { n as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { I as require_jsx_runtime } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
-import { i as cn } from "./input-BTXCllkk.mjs";
-import { a as AlertDialogDescription, c as AlertDialogTitle, i as AlertDialogContent, n as AlertDialogAction, o as AlertDialogFooter, r as AlertDialogCancel, s as AlertDialogHeader, t as AlertDialog } from "./nomes-zltfDt9_.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/ConfirmDialog-vgkDbybm.js
+import { i as cn } from "./input-2NYfids5.mjs";
+import { a as AlertDialogDescription, c as AlertDialogTitle, i as AlertDialogContent, n as AlertDialogAction, o as AlertDialogFooter, r as AlertDialogCancel, s as AlertDialogHeader, t as AlertDialog } from "./nomes-BOIzUybv.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/ConfirmDialog-jCJOZO9Q.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -17,7 +17,7 @@ var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE
 Table.displayName = "Table";
 var TableHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
 	ref,
-	className: cn("[&_tr]:border-b", className),
+	className: cn("bg-muted/40 [&_tr]:border-b [&_tr]:border-border/70 [&_th]:text-[11px] [&_th]:font-bold [&_th]:uppercase [&_th]:tracking-[0.12em]", className),
 	...props
 }));
 TableHeader.displayName = "TableHeader";
@@ -35,7 +35,7 @@ var TableFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @
 TableFooter.displayName = "TableFooter";
 var TableRow = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
 	ref,
-	className: cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className),
+	className: cn("border-b border-border/60 transition-colors hover:bg-accent/50 data-[state=selected]:bg-accent/70", className),
 	...props
 }));
 TableRow.displayName = "TableRow";

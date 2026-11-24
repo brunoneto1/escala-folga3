@@ -2,7 +2,7 @@ import { n as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { I as require_jsx_runtime, M as Slot, d as DialogContent, f as DialogDescription, h as DialogTitle, l as Dialog, m as DialogPortal, p as DialogOverlay, u as DialogClose } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
-import { i as cn, n as Input, t as Button } from "./input-BTXCllkk.mjs";
+import { i as cn, n as Input, t as Button } from "./input-2NYfids5.mjs";
 import { a as Tag, g as Briefcase, h as CalendarDays, l as PanelLeft, n as Users, t as X } from "../_libs/lucide-react.mjs";
 import { r as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
@@ -10,7 +10,7 @@ import { t as Toaster } from "../_libs/sonner.mjs";
 import { Bt as redirect, _ as createFileRoute, b as useRouter, d as Scripts, f as HeadContent, g as lazyRouteComponent, h as Outlet, m as createRouter, v as createRootRouteWithContext, y as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { t as Separator$1 } from "../_libs/radix-ui__react-separator.mjs";
 import { a as TooltipTrigger$1, i as TooltipProvider$1, n as TooltipContent$1, r as TooltipPortal, t as Tooltip$1 } from "../_libs/radix-ui__react-tooltip.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-B7eRiYFe.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-35ebIrzu.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Toaster$1 = ({ ...props }) => {
@@ -373,7 +373,7 @@ var SidebarMenuItem = import_react.forwardRef(({ className, ...props }, ref) => 
 	...props
 }));
 SidebarMenuItem.displayName = "SidebarMenuItem";
-var sidebarMenuButtonVariants = cva("peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring cursor-pointer transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0", {
+var sidebarMenuButtonVariants = cva("peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-lg p-2 text-left text-sm outline-none ring-sidebar-ring cursor-pointer transition-[width,height,padding,background-color] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-[inset_3px_0_0_#ea6109] data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0", {
 	variants: {
 		variant: {
 			default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -501,15 +501,16 @@ var itens = [
 function AppLayout({ children }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SidebarProvider, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sidebar, {
 		collapsible: "icon",
+		className: "border-r border-sidebar-border",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SidebarHeader, {
 			className: "px-4 py-5",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "flex items-center gap-2 overflow-hidden",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-extrabold text-sidebar-primary-foreground",
+					className: "flex size-9 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary font-extrabold text-sidebar-primary-foreground shadow-sm",
 					children: "F"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-					className: "truncate text-base font-bold group-data-[collapsible=icon]:hidden",
+					className: "truncate text-base font-bold tracking-tight group-data-[collapsible=icon]:hidden",
 					children: "Gestor de escala"
 				})]
 			})
@@ -525,15 +526,15 @@ function AppLayout({ children }) {
 	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "flex min-h-screen flex-1 flex-col",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("header", {
-			className: "flex h-14 items-center border-b bg-card px-4",
+			className: "flex h-14 items-center border-b border-border/70 bg-card px-4",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SidebarTrigger, {})
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
-			className: "flex-1 p-6 md:p-8",
+			className: "flex-1 bg-background p-5 md:p-8",
 			children
 		})]
 	})] });
 }
-var styles_default = "/assets/styles-B5-OFH9x.css";
+var styles_default = "/assets/styles-BHNA9Ijz.css";
 function reportLovableError(error, context = {}) {
 	if (typeof window === "undefined") return;
 	window.__lovableEvents?.captureException?.(error, {
@@ -728,7 +729,7 @@ var Route$4 = createFileRoute("/")({
 		}
 	] })
 });
-var $$splitComponentImporter$3 = () => import("./calendario-BnG4r-Pz.mjs");
+var $$splitComponentImporter$3 = () => import("./calendario-D4Y_cm3L.mjs");
 var Route$3 = createFileRoute("/calendario")({
 	head: () => ({ meta: [
 		{ title: "Calendário — Escala de Folgas" },
@@ -747,7 +748,7 @@ var Route$3 = createFileRoute("/calendario")({
 	] }),
 	component: lazyRouteComponent($$splitComponentImporter$3, "component")
 });
-var $$splitComponentImporter$2 = () => import("./cargos-WCeLOxVC.mjs");
+var $$splitComponentImporter$2 = () => import("./cargos-wVDSINnV.mjs");
 var Route$2 = createFileRoute("/cargos")({
 	head: () => ({ meta: [
 		{ title: "Cargos — Escala de Folgas" },
@@ -766,7 +767,7 @@ var Route$2 = createFileRoute("/cargos")({
 	] }),
 	component: lazyRouteComponent($$splitComponentImporter$2, "component")
 });
-var $$splitComponentImporter$1 = () => import("./funcionarios-DpLDfCO5.mjs");
+var $$splitComponentImporter$1 = () => import("./funcionarios-9z4FzKYI.mjs");
 var Route$1 = createFileRoute("/funcionarios")({
 	head: () => ({ meta: [
 		{ title: "Funcionários — Escala de Folgas" },
@@ -785,7 +786,7 @@ var Route$1 = createFileRoute("/funcionarios")({
 	] }),
 	component: lazyRouteComponent($$splitComponentImporter$1, "component")
 });
-var $$splitComponentImporter = () => import("./tipos-folga-B5cpQhEp.mjs");
+var $$splitComponentImporter = () => import("./tipos-folga-BZGP0yLr.mjs");
 var Route = createFileRoute("/tipos-folga")({
 	head: () => ({ meta: [
 		{ title: "Tipos de folga — Escala de Folgas" },

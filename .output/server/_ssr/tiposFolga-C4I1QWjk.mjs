@@ -1,6 +1,6 @@
-import { _ as limparNome, v as nomeDuplicado } from "./nomes-zltfDt9_.mjs";
+import { _ as nomeDuplicado, g as limparNome } from "./nomes-BOIzUybv.mjs";
 import { t as supabase } from "./client-CPmvs8V5.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/tiposFolga-CFZa3EzW.js
+//#region node_modules/.nitro/vite/services/ssr/assets/tiposFolga-C4I1QWjk.js
 async function listarTiposFolga() {
 	const { data, error } = await supabase.from("tipos_folga").select("*").order("nome");
 	if (error) throw new Error("Não foi possível carregar os tipos de folga.");
